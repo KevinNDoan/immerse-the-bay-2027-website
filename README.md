@@ -29,7 +29,7 @@ npm run check:copy  # Fail on em dashes, dot separators, emoji or all-caps label
 
 ## Pages
 
-- `/` is the pitch, laid out like Harvey's platform page (harvey.ai/platform). The light half: hero, demo, why it has to be a headset, ZAP! in numbers, and the playable constellation. The dark half: one row per move (say it, throw it, zap it, step inside, with the portal), what it's built on, questions judges ask, and a close with the QR code. The nav turns dark over the dark half.
+- `/` is the pitch, laid out like harvey.ai's home page: a full-width bar (wordmark at the left edge, sections in the middle, two buttons at the right edge) that turns dark over the dark half. The light half: hero and a near edge-to-edge demo, the parts it is built on, the two spaces (the void and a world), the playable constellation, how it works (a list that drives the 3D scene), and the rotating reasons it has to be a headset. The dark half: stepping inside a world (the portal), ZAP! in numbers, questions judges ask, and a close with the QR code.
 - `/pamphlet` is the judges' overview, styled like a shared doc. Once opened it is saved for offline reading by `public/sw.js` (production builds only), and it prints on one Letter page.
 - `/zap-pamphlet.pdf` is the same overview as a one-page PDF, rendered once at build time.
 

@@ -61,6 +61,7 @@ export const LABELS = {
   tryIt: "Try it",
   stepInside: "Step inside",
   questions: "Questions",
+  menu: "Menu",
   pamphlet: "Pamphlet",
   watchDemo: "Watch the demo",
   openPamphlet: "Read the pamphlet",

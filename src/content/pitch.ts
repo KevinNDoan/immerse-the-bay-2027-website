@@ -50,7 +50,7 @@ export const spaces = {
   items: [
     {
       title: "The void",
-      text: "A dark, quiet space around you. Say topics, throw them where they belong, and zap them together into a constellation of everything you are learning.",
+      text: "A dark, quiet space around you. Say topics, throw them into the space around you, and zap them together into a constellation of everything you are learning.",
       cta: "Try the void",
       href: "#try",
     },

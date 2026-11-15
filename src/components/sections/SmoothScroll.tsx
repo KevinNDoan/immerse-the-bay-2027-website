@@ -73,20 +73,38 @@ function PitchControls({ smooth }: { smooth: boolean }) {
   }, [lenis]);
 
   useEffect(() => {
+    // Where the last key press sent the page, and until when that move runs. Lenis only updates its own target
+    // as a scripted move animates, so a quick second press has to count from here instead.
+    let pending: { to: number; until: number } | null = null;
     const onKey = (e: KeyboardEvent) => {
       const dir = NEXT_KEYS.has(e.key) || (e.key === " " && !e.shiftKey) ? 1 : PREV_KEYS.has(e.key) || e.key === " " ? -1 : 0;
       if (dir === 0 || isForSomethingElse(e)) return;
       // Mid-move, count from where the page is heading, so quick presses keep advancing.
-      const to = stop(dir, lenis ? lenis.targetScroll : window.scrollY);
+      const moving = pending && performance.now() < pending.until;
+      const to = stop(dir, moving && pending ? pending.to : lenis ? lenis.targetScroll : window.scrollY);
       if (to === null) return;
       e.preventDefault();
       // A held key would race through the whole pitch; one press, one section.
       if (e.repeat) return;
+      pending = { to, until: performance.now() + DURATION * 1000 + 50 };
       if (lenis) lenis.scrollTo(to, { duration: DURATION, easing: EASE });
       else window.scrollTo({ top: to, behavior: smooth ? "smooth" : "auto" });
     };
+    // A wheel, touch or pointer scroll takes over from a key move, so the next key press counts from where
+    // the page really is.
+    const drop = () => {
+      pending = null;
+    };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener("wheel", drop, { passive: true });
+    window.addEventListener("touchstart", drop, { passive: true });
+    window.addEventListener("pointerdown", drop, { passive: true });
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("wheel", drop);
+      window.removeEventListener("touchstart", drop);
+      window.removeEventListener("pointerdown", drop);
+    };
   }, [lenis, smooth]);
 
   return null;

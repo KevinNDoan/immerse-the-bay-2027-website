@@ -18,7 +18,7 @@ export function Numbers() {
         {/* A plain list, so each row reads once, label then figure. */}
         <ul className="mt-12 border-b-2 border-white/10">
           {numbers.items.map((n, i) => (
-            <li key={n.value} className="border-t-2 border-white/10">
+            <li key={n.label} className="border-t-2 border-white/10">
               <Reveal delay={i * 0.04} className="grid items-baseline gap-2 py-5 sm:grid-cols-12 sm:gap-8 sm:py-6">
                 <span className="text-[15px] leading-snug text-white/75 sm:col-span-5">{n.label}</span>
                 <span className="text-[clamp(2.75rem,5.2vw,4.25rem)] leading-none font-normal tracking-[-0.04em] sm:col-span-6 sm:col-start-7">
