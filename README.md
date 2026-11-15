@@ -1,8 +1,8 @@
 # ZAP! pitch site
 
-The pitch site for ZAP!, a Meta Quest 3 study tool built at Immerse the Bay 2027 for the Visko Living Worlds track. It reads like a pitch deck that scrolls. A pamphlet for judges sits alongside it: they scan a QR code and keep it as a PDF.
+The pitch site for ZAP!, a Meta Quest 3 study tool built at Immerse the Bay 2027 for the Visko Living Worlds track. It reads like a pitch deck that scrolls, one screen per section. A one-page overview for judges sits alongside it: they scan a QR code, read it like a shared doc, and it keeps working offline.
 
-The product itself lives in `~/immerse-the-bay-2027`. Its `docs/design-system.md` sets the look: white on Void `#07050D`, Inter, playful and electric. The star, note and line images in `public/art/` are the designer's exports from that project.
+The product itself lives in `~/immerse-the-bay-2027`. Its `docs/design-system.md` sets the look (updated 2026-11-15): the designer's silver sky behind frosted white glass panels, Ink text, lightning yellow `#FFD60A` as the one accent, and Bricolage Grotesque for all text. The 3D pieces (demo, Try it, portal) stay dark Void "screens", because their white star art needs a dark backdrop. Everything in `public/art/` is the designer's export from that project: `zap-wordmark.png` and `zap-icon.png` are the final logo, `sky.webp` is the sky panorama, and the star, note and line images feed the 3D. The PDF uses the Bricolage Grotesque files in `assets/fonts/` (SIL OFL, licence alongside).
 
 ## Getting started
 
@@ -29,9 +29,13 @@ npm run check:copy  # Fail on em dashes, dot separators, emoji or all-caps label
 
 ## Pages
 
-- `/` is the pitch: hero demo, the problem, how it works, a playable constellation, worlds, why a headset, what it's built on, questions judges ask, and a close with the QR code.
-- `/pamphlet` is the judges' leave-behind. It is phone-first and prints to two Letter pages.
-- `/zap-pamphlet.pdf` is the same pamphlet as a PDF, rendered once at build time.
+- `/` is the pitch: hero, demo, how it works, a playable constellation, stepping inside a world, why a headset, what it's built on, questions judges ask, and a close with the QR code.
+- `/pamphlet` is the judges' overview, styled like a shared doc. Once opened it is saved for offline reading by `public/sw.js` (production builds only), and it prints on one Letter page.
+- `/zap-pamphlet.pdf` is the same overview as a one-page PDF, rendered once at build time.
+
+## Pitching
+
+Every top-level section fills at least one screen. Arrow keys, Space, Page Up and Page Down (what most presentation clickers send) move one section at a time, and a wheel or trackpad scroll that stops near a section settles onto it. Sections taller than the screen are paged through before moving on. The code is in `src/components/sections/SmoothScroll.tsx`.
 
 ## Environment
 

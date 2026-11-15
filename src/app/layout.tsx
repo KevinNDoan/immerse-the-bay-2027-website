@@ -1,10 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Bricolage_Grotesque } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { SITE_URL } from "@/lib/site";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+// The design system's typeface for all text (design-system.md, Type). The logo keeps its own lettering.
+const bricolage = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-bricolage" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -14,13 +15,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: "ZAP! Study in space",
     description: "Say it. Throw it. Zap it. Step inside.",
-    images: ["/art/app_icon.png"],
+    images: ["/art/zap-icon.png"],
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#07050d",
-  colorScheme: "dark",
+  themeColor: "#dadee3",
+  colorScheme: "light",
 };
 
 export default function RootLayout({
@@ -29,7 +30,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("font-sans", inter.variable)}>
+    <html lang="en" className={cn("font-sans", bricolage.variable)}>
       <body>{children}</body>
     </html>
   );

@@ -1,23 +1,27 @@
 import { TryItDemo } from "@/components/scene";
 import { tryIt } from "@/content/pitch";
-import { CARD, CONTENT, SECTION } from "./layout";
+import { CARD, CONTENT, H2, SECTION } from "./layout";
 import { Reveal } from "./Reveal";
 
-/** One large card holding the in-browser void, titled in its footer. */
+/**
+ * Where Harvey has a testimonial (picture left, words right), ZAP! puts the thing itself: the playable void on
+ * the left, what it is on the right. We have no quotes yet, and a made-up one would not be honest.
+ */
 export function TryIt() {
   return (
     <section id="try" aria-labelledby="try-title" className={`${CONTENT} ${SECTION}`}>
-      <Reveal className={`${CARD} overflow-hidden`}>
-        <div className="p-3 sm:p-5">
+      <div className="grid gap-8 lg:grid-cols-12 lg:items-center lg:gap-8">
+        <Reveal className={`${CARD} p-3 sm:p-4 lg:col-span-7`}>
           <TryItDemo />
-        </div>
-        <div className="flex flex-col gap-1 border-t border-white/10 px-5 py-4 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6 sm:px-6">
-          <h2 id="try-title" className="text-xl font-medium tracking-[-0.02em]">
+        </Reveal>
+        <Reveal delay={0.06} className="lg:col-span-4 lg:col-start-9">
+          <h2 id="try-title" className={H2}>
             {tryIt.title}
           </h2>
-          <p className="text-sm text-white/70">{tryIt.note}</p>
-        </div>
-      </Reveal>
+          <p className="mt-5 text-base leading-relaxed text-ink/75 sm:text-lg">{tryIt.text}</p>
+          <p className="mt-4 text-sm text-ink/70">{tryIt.note}</p>
+        </Reveal>
+      </div>
     </section>
   );
 }

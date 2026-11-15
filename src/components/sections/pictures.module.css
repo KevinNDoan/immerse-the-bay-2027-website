@@ -1,4 +1,4 @@
-/* The small pictures on top of the How it works cards, made from the ZAP! art in public/art.
+/* The small looping pictures (the product rows and the headset claims), made from the ZAP! art in public/art.
    Cheap CSS loops, no canvases. Springy, never floaty. Everything stands still for reduced motion. */
 
 @property --sweep {

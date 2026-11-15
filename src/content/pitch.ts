@@ -43,6 +43,21 @@ export const steps: readonly Step[] = [
   },
 ];
 
+/** The lead line over the dark product rows. */
+export const stepsLead =
+  "One headset and four moves. Say a topic, throw it into place, zap it to the next idea, then step inside it.";
+
+/** A few true numbers, Harvey-style. Each one is backed by the answers further down the page. */
+export const numbers = {
+  title: "ZAP! in numbers",
+  items: [
+    { value: "4", label: "moves to learn: say it, throw it, zap it, step inside" },
+    { value: "2 s", label: "about how long a world takes to answer what you ask" },
+    { value: "30 cm", label: "the closest anything in ZAP! ever comes to your face" },
+    { value: "$0.58", label: "a minute on Orbis, and only while you are inside a world" },
+  ],
+} as const;
+
 export const tryIt = {
   title: "Try it here",
   text: "A small version of the void, in your browser. Type a topic to make a star, then drag from one star to another to zap them together.",
@@ -140,16 +155,31 @@ export const close = {
   pdfLabel: "Download the PDF",
 } as const;
 
+/**
+ * The pamphlet: a one-page overview judges open from the QR code. It reads like a shared doc, keeps working
+ * offline once opened, and saves as a one-page PDF. It holds less than the site on purpose.
+ */
 export const pamphlet = {
-  title: "ZAP! in one page",
+  title: "ZAP! overview",
+  subtitle: "A study tool for Meta Quest 3, built at Immerse the Bay 2027 for the Living Worlds track.",
   intro:
-    "A study tool for Meta Quest 3. You say a topic, throw it into space as a star, zap related stars together, and step inside any of them to explore a world generated live by Orbis.",
+    "You say a topic, throw it into space as a star, zap related stars together, and step inside any of them to explore a world generated live by Orbis.",
+  whatTitle: "What it is",
   howTitle: "How it works",
-  whyTitle: "Why it has to be a headset",
-  questionsTitle: "Questions judges ask",
+  whyTitle: "Why VR?",
+  whyLead: "Because it has to be a headset. Three things a screen can't do:",
+  questionsTitle: "What judges ask",
   techTitle: "Built on",
+  trackTitle: "Why it fits Living Worlds",
+  siteLabel: "See the full pitch",
   footer: "Immerse the Bay 2027, Living Worlds track.",
+  offlineSaving: "Saving for offline",
+  offlineReady: "Available offline",
+  offlineNow: "Offline, showing the saved copy",
 } as const;
+
+/** The questions short enough for the overview: is the world more than eye candy, comfort, the lag, and the network. */
+export const pamphletQuestions: readonly Question[] = [questions[1], questions[2], questions[3], questions[4]];
 
 /**
  * The demo video under the hero. Record a short headset capture, drop it in public/media/ and set `src`

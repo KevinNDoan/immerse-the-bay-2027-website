@@ -19,7 +19,7 @@ export function BuiltOn() {
               <p className="grid min-h-28 flex-1 place-items-center px-5 py-8 text-center text-xl font-medium tracking-[-0.02em]">
                 {item.name}
               </p>
-              <p className="border-t border-white/10 px-5 py-3.5 text-sm text-white/70">{item.role}</p>
+              <p className="border-t border-ink/10 px-5 py-3.5 text-sm text-ink/70">{item.role}</p>
             </Reveal>
           </li>
         ))}

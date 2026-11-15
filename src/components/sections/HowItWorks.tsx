@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { product, steps, worlds } from "@/content/pitch";
 import b from "./bento.module.css";
-import { CARD, CONTENT, H2, LABELS, SECTION } from "./layout";
+import { CARD, CONTENT, H2, LABELS, SCREEN, SECTION } from "./layout";
 import { Reveal } from "./Reveal";
 
 /** A plain <img> for the small art: these are decorative and tiny, so next/image buys nothing here. */
@@ -84,18 +84,18 @@ export function HowItWorks() {
           {LABELS.howItWorks}
         </h2>
       </Reveal>
-      <div className="mt-10 grid gap-3 sm:mt-12 sm:grid-cols-2 sm:gap-4 lg:grid-cols-12">
+      <div className="mt-10 grid gap-3 sm:mt-12 sm:grid-cols-2 sm:gap-4 lg:mt-8 lg:grid-cols-12">
         {CARDS.map((c, i) => (
           <Reveal key={c.title} delay={(i % 3) * 0.05} className={`${CARD} flex flex-col overflow-hidden ${SPANS[i]}`}>
             <div
               aria-hidden
-              className="h-44 border-b border-white/10 bg-[radial-gradient(80%_70%_at_50%_45%,rgb(255_255_255/0.05),transparent_70%)] sm:h-52"
+              className={`m-2 mb-0 h-40 rounded-xl ${SCREEN} sm:h-48 lg:h-32`}
             >
               <div className={b.stage}>{VISUALS[i]}</div>
             </div>
-            <div className="flex flex-1 flex-col p-5 sm:p-6">
+            <div className="flex flex-1 flex-col p-5 sm:p-6 lg:p-5">
               <h3 className="text-lg font-medium tracking-[-0.015em]">{c.title}</h3>
-              <p className="mt-2 text-[15px] leading-relaxed text-white/70">{c.text}</p>
+              <p className="mt-2 text-[15px] leading-relaxed text-ink/70">{c.text}</p>
             </div>
           </Reveal>
         ))}

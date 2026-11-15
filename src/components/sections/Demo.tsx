@@ -6,10 +6,9 @@ import { useReducedMotion } from "motion/react";
 import { demoVideo } from "@/content/pitch";
 import { DemoReel } from "@/components/scene";
 import { cn } from "@/lib/utils";
-import { CONTENT, LABELS, PILL, PILL_DARK } from "./layout";
+import { CONTENT, LABELS, PILL, SCREEN } from "./layout";
 
-const FRAME =
-  "relative aspect-video overflow-hidden rounded-2xl border border-white/10 bg-[radial-gradient(120%_90%_at_50%_0%,rgb(255_255_255/0.06),transparent_60%),linear-gradient(180deg,#140d26,#07050d)]";
+const FRAME = `relative aspect-video overflow-hidden rounded-2xl ${SCREEN} shadow-[0_24px_64px_rgb(11_8_20/0.25)]`;
 
 /**
  * The demo, right under the hero. With a recorded video it plays muted and looping, with a pause button;
@@ -17,13 +16,16 @@ const FRAME =
  */
 export function Demo() {
   return (
-    <section id="demo" aria-labelledby="demo-caption" className={`${CONTENT} scroll-mt-24`}>
-      <div className={FRAME}>
-        {demoVideo.src ? <DemoVideo src={demoVideo.src} poster={demoVideo.poster} /> : <DemoReel className="absolute inset-0" />}
+    <section id="demo" aria-labelledby="demo-caption" className={`${CONTENT} flex flex-col justify-center py-4 md:min-h-svh md:py-20`}>
+      {/* As wide as the column, but never taller than the screen leaves room for, so it fits as one stop. */}
+      <div className="mx-auto w-full max-w-[calc((100svh-11rem)*16/9)]">
+        <div className={FRAME}>
+          {demoVideo.src ? <DemoVideo src={demoVideo.src} poster={demoVideo.poster} /> : <DemoReel className="absolute inset-0" />}
+        </div>
+        <p id="demo-caption" className="mt-4 text-sm leading-relaxed text-ink/70">
+          {demoVideo.label}
+        </p>
       </div>
-      <p id="demo-caption" className="mt-4 text-sm leading-relaxed text-white/70">
-        {demoVideo.label}
-      </p>
     </section>
   );
 }
@@ -57,7 +59,7 @@ function DemoVideo({ src, poster }: { src: string; poster: string | null }) {
       <button
         type="button"
         onClick={() => (playing ? ref.current?.pause() : ref.current?.play().catch(() => {}))}
-        className={cn(PILL, PILL_DARK, "absolute right-3 bottom-3 bg-void/70 backdrop-blur-md sm:right-4 sm:bottom-4")}
+        className={cn(PILL, "absolute right-3 bottom-3 bg-white/90 text-ink shadow-[0_6px_20px_rgb(0_0_0/0.3)] hover:bg-white sm:right-4 sm:bottom-4")}
       >
         {playing ? <Pause aria-hidden className="size-4" /> : <Play aria-hidden className="size-4" />}
         {playing ? LABELS.pauseDemo : LABELS.playDemo}

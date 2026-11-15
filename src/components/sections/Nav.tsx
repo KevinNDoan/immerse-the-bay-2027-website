@@ -2,71 +2,102 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { ArrowUpRight } from "lucide-react";
 import { motion, useMotionValueEvent, useReducedMotion, useScroll } from "motion/react";
-import { close } from "@/content/pitch";
-import { PAMPHLET_PDF_PATH } from "@/lib/site";
 import { SPRING } from "@/lib/motion";
 import { cn } from "@/lib/utils";
-import { LABELS, PILL, PILL_PRIMARY, PILL_QUIET } from "./layout";
+import { CONTENT, LABELS } from "./layout";
 
 const LINKS = [
-  { href: "#how", label: LABELS.howItWorks },
-  { href: "#try", label: LABELS.tryIt },
-  { href: "#step-inside", label: LABELS.stepInside },
-  { href: "#questions", label: LABELS.questions },
+  { id: "how", label: LABELS.howItWorks },
+  { id: "try", label: LABELS.tryIt },
+  { id: "step-inside", label: LABELS.stepInside },
+  { id: "questions", label: LABELS.questions },
 ] as const;
 
-/** How far down the page, in px, before the bar tucks into its floating shape. */
-const TUCK_AT = 24;
+/** The id of the section crossing the middle of the screen, or null between sections. */
+function useActiveSection() {
+  const [active, setActive] = useState<string | null>(null);
+  useEffect(() => {
+    const sections = [...document.querySelectorAll<HTMLElement>("main > section[id]")];
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) if (e.isIntersecting) setActive(e.target.id);
+      },
+      // A one-pixel band across the middle of the viewport: whichever section covers it is the current one.
+      { rootMargin: "-50% 0px -50% 0px" },
+    );
+    sections.forEach((s) => io.observe(s));
+    return () => io.disconnect();
+  }, []);
+  return active;
+}
 
 /**
- * At the top of the page the bar spans the page, flat. Once you scroll it springs into a centred, rounded,
- * blurred bar at the content width, and stays there until you are back at the top.
+ * A quiet bar fixed to the top: the wordmark, the four sections in the middle, the pamphlet on the right.
+ * It is clear over the hero and fades in a blurred backing once you scroll. The current section gets a soft
+ * pill that slides between links, which also tells the room where the pitch is.
  */
 export function Nav() {
   const { scrollY } = useScroll();
   const reduce = useReducedMotion();
-  const [tucked, setTucked] = useState(false);
-  useMotionValueEvent(scrollY, "change", (y) => setTucked(y > TUCK_AT));
+  const [scrolled, setScrolled] = useState(false);
+  useMotionValueEvent(scrollY, "change", (y) => setScrolled(y > 8));
+  const active = useActiveSection();
 
   return (
-    <header className="sticky top-0 z-40 px-3 pt-3 sm:px-4">
-      <motion.div
-        initial={false}
-        animate={{
-          maxWidth: tucked ? 1160 : 1440,
-          backgroundColor: tucked ? "rgba(7, 5, 13, 0.72)" : "rgba(7, 5, 13, 0)",
-          borderColor: tucked ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0)",
-          paddingLeft: tucked ? 8 : 16,
-          paddingRight: tucked ? 8 : 16,
-        }}
-        transition={reduce ? { duration: 0 } : SPRING}
-        className={`mx-auto flex h-14 items-center gap-2 rounded-2xl border ${tucked ? "backdrop-blur-xl backdrop-saturate-150" : ""}`}
-      >
-        <Link href="#top" aria-label={LABELS.home} className="flex min-h-11 shrink-0 items-center rounded-full px-2.5">
-          <Image src="/art/wordmark.png" alt="" width={1600} height={600} preload className="h-6 w-auto" />
+    <header className="fixed inset-x-0 top-0 z-40">
+      <div
+        aria-hidden
+        className={cn(
+          "absolute inset-0 bg-white/30 shadow-[inset_0_-1px_0_rgb(255_255_255/0.6),0_10px_30px_rgb(11_8_20/0.08)] backdrop-blur-[28px] backdrop-saturate-150 transition-opacity duration-300",
+          scrolled ? "opacity-100" : "opacity-0",
+        )}
+      />
+      <div className={cn(CONTENT, "relative grid h-16 grid-cols-[1fr_auto] items-center md:grid-cols-[1fr_auto_1fr]")}>
+        <Link href="#top" aria-label={LABELS.home} className="flex min-h-11 items-center justify-self-start rounded-md">
+          <Image src="/art/zap-wordmark.png" alt="" width={819} height={340} preload className="-ml-1 h-9 w-auto" />
         </Link>
-        <nav aria-label="Sections" className="ml-4 hidden items-center lg:flex">
-          {LINKS.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              className="flex min-h-11 items-center rounded-full px-3 text-[15px] text-white/70 transition-colors duration-150 hover:text-white"
-            >
-              {l.label}
-            </a>
-          ))}
+
+        <nav aria-label="Sections" className="hidden items-center md:flex">
+          {LINKS.map((l) => {
+            const on = active === l.id;
+            return (
+              <a
+                key={l.id}
+                href={`#${l.id}`}
+                aria-current={on ? "location" : undefined}
+                className={cn(
+                  "relative flex min-h-11 items-center px-3.5 text-sm transition-colors duration-150",
+                  on ? "text-ink" : "text-ink/65 hover:text-ink",
+                )}
+              >
+                {on && (
+                  <motion.span
+                    layoutId="nav-current"
+                    aria-hidden
+                    className="absolute inset-x-0.5 inset-y-1.5 rounded-full bg-white/55 shadow-[inset_0_1px_0_rgb(255_255_255/0.8),0_2px_8px_rgb(11_8_20/0.08)]"
+                    transition={reduce ? { duration: 0 } : SPRING}
+                  />
+                )}
+                <span className="relative">{l.label}</span>
+              </a>
+            );
+          })}
         </nav>
-        <div className="ml-auto flex items-center gap-1">
-          <Link href="/pamphlet" className={cn(PILL, PILL_QUIET, "hidden sm:inline-flex")}>
-            {LABELS.pamphlet}
-          </Link>
-          <a href={PAMPHLET_PDF_PATH} download className={`${PILL} ${PILL_PRIMARY}`}>
-            {close.pdfLabel}
-          </a>
-        </div>
-      </motion.div>
+
+        <Link
+          href="/pamphlet"
+          className="group flex min-h-11 items-center gap-1 justify-self-end text-sm text-ink/80 transition-colors duration-150 hover:text-ink"
+        >
+          {LABELS.pamphlet}
+          <ArrowUpRight
+            aria-hidden
+            className="size-4 transition-transform duration-150 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 motion-reduce:transition-none"
+          />
+        </Link>
+      </div>
     </header>
   );
 }

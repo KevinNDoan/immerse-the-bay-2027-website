@@ -1,21 +1,31 @@
 import { whyXr } from "@/content/pitch";
-import { CARD, CONTENT, H2, SECTION } from "./layout";
+import { CONTENT, H2, SCREEN, SECTION } from "./layout";
+import { Picture, type PictureName } from "./pictures";
 import { Reveal } from "./Reveal";
 
-/** Three claims for why this needs a headset, one card each. */
+/** One picture per claim: the orbit for memory, the request marker for hands-on study, the rush for presence. */
+const PICTURE: readonly PictureName[] = ["remember", "steer", "enter"];
+
+/**
+ * Harvey's "why" row: the heading on the left, then three tall picture tiles, each with its title and a few
+ * lines under it, outside the tile.
+ */
 export function WhyXr() {
   return (
     <section id="why" aria-labelledby="why-title" className={`${CONTENT} ${SECTION}`}>
       <Reveal>
-        <h2 id="why-title" className={`${H2} max-w-[16ch]`}>
+        <h2 id="why-title" className={`${H2} max-w-[18ch]`}>
           {whyXr.title}
         </h2>
       </Reveal>
-      <div className="mt-10 grid gap-3 sm:mt-12 sm:gap-4 md:grid-cols-3">
+      <div className="mt-10 grid gap-10 sm:mt-12 md:grid-cols-3 md:gap-5">
         {whyXr.claims.map((c, i) => (
-          <Reveal key={c.title} delay={i * 0.05} className={`${CARD} flex flex-col p-6 sm:p-7`}>
-            <h3 className="text-[clamp(1.5rem,2.4vw,1.875rem)] leading-[1.1] font-medium tracking-[-0.03em]">{c.title}</h3>
-            <p className="mt-4 text-[15px] leading-relaxed text-white/70">{c.text}</p>
+          <Reveal key={c.title} delay={i * 0.06}>
+            <div className={`aspect-[4/3] overflow-hidden rounded-2xl md:aspect-[5/6] lg:aspect-square ${SCREEN}`}>
+              <Picture name={PICTURE[i]} scale={1.5} />
+            </div>
+            <h3 className="mt-5 text-xl font-medium tracking-[-0.015em]">{c.title}</h3>
+            <p className="mt-2 text-[15px] leading-relaxed text-ink/75">{c.text}</p>
           </Reveal>
         ))}
       </div>

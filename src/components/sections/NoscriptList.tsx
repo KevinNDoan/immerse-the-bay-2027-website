@@ -17,9 +17,9 @@ export function NoscriptList({
       <style>{`[data-noscript-hide="${scope}"]{display:none}`}</style>
       <dl className={className}>
         {items.map((item) => (
-          <div key={item.title} className="border-b border-white/15 py-6">
+          <div key={item.title} className="border-b border-ink/15 py-6">
             <dt className="text-xl font-medium tracking-[-0.01em]">{item.title}</dt>
-            <dd className="mt-3 text-lg leading-relaxed text-white/70">{item.text}</dd>
+            <dd className="mt-3 text-lg leading-relaxed text-ink/70">{item.text}</dd>
           </div>
         ))}
       </dl>

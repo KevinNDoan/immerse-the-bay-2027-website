@@ -63,11 +63,11 @@ export function TryItDemo({ className }: TryItDemoProps) {
           maxLength={40}
           autoComplete="off"
           enterKeyHint="go"
-          className="h-12 min-w-0 flex-1 rounded-full border border-white/15 bg-white/5 px-5 text-base text-white transition-colors placeholder:text-white/60 hover:border-white/30 focus-visible:border-white/70 focus-visible:outline-none"
+          className="h-12 min-w-0 flex-1 rounded-full border border-ink/15 bg-white/50 px-5 text-base text-ink transition-colors placeholder:text-ink/55 hover:border-ink/30 focus-visible:border-ink/70"
         />
         <button
           type="submit"
-          className="h-12 shrink-0 rounded-full bg-white px-5 text-base font-medium text-void transition-[background-color,transform] hover:bg-white/85 active:scale-[0.97]"
+          className="h-12 shrink-0 rounded-full bg-zap px-5 text-base font-medium text-ink transition-[background-color,transform] hover:bg-[#ffe03d] active:scale-[0.97]"
         >
           Add
         </button>
@@ -79,14 +79,14 @@ export function TryItDemo({ className }: TryItDemoProps) {
             key={ex}
             type="button"
             onClick={() => add(ex)}
-            className="min-h-11 rounded-full border border-white/15 px-4 text-sm text-white/70 transition-[color,border-color,transform] hover:border-white/40 hover:text-white active:scale-[0.97]"
+            className="min-h-11 rounded-full border border-ink/15 bg-white/30 px-4 text-sm text-ink/75 transition-[color,border-color,transform] hover:border-ink/35 hover:text-ink active:scale-[0.97]"
           >
             {ex}
           </button>
         ))}
       </div>
 
-      <div className="relative mt-4 aspect-[4/5] w-full overflow-hidden rounded-3xl border border-white/15 bg-void-lift/30 sm:aspect-[16/10] sm:max-h-[72svh]">
+      <div className="relative mt-4 aspect-[4/5] w-full screen overflow-hidden rounded-3xl bg-[radial-gradient(120%_90%_at_50%_0%,rgb(255_255_255/0.07),transparent_60%),linear-gradient(180deg,#140d26,#07050d)] sm:aspect-[16/10] sm:max-h-[max(20rem,calc(100svh-27rem))]">
         <TryItCanvas state={state} dispatch={dispatch} onBox={onBox} />
         {state.stars.length === 0 ? (
           <p className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 px-6 text-center text-sm text-white/60">
@@ -96,12 +96,12 @@ export function TryItDemo({ className }: TryItDemoProps) {
       </div>
 
       <div className="mt-3 flex items-center justify-between gap-4">
-        <p className="text-sm text-white/70">{state.full ? FULL : HINT}</p>
+        <p className="text-sm text-ink/70">{state.full ? FULL : HINT}</p>
         <button
           type="button"
           onClick={() => dispatch({ type: "clear" })}
           disabled={state.stars.length === 0}
-          className="min-h-11 shrink-0 rounded-full border border-white/15 px-4 text-sm text-white transition-[border-color,opacity] hover:border-white/40 disabled:opacity-40"
+          className="min-h-11 shrink-0 rounded-full border border-ink/15 bg-white/30 px-4 text-sm text-ink transition-[border-color,opacity] hover:border-ink/35 disabled:opacity-40"
         >
           Clear
         </button>

@@ -1,6 +1,6 @@
 import { product, worlds } from "@/content/pitch";
 import { PortalScene } from "@/components/scene";
-import { CARD, CONTENT, H2, LABELS, PILL, PILL_DARK, SECTION, SUB } from "./layout";
+import { CONTENT, H2, LABELS, PILL, PILL_GLASS, SCREEN, SECTION, SUB } from "./layout";
 import { cn } from "@/lib/utils";
 import { Reveal } from "./Reveal";
 
@@ -17,17 +17,17 @@ export function StepInside() {
             {worlds.title}
           </h2>
           <p className={`${SUB} mt-5`}>{worlds.text}</p>
-          <div className="mt-6 border-t border-white/10 pt-5">
+          <div className="mt-6 border-t border-ink/15 pt-5">
             <h3 className="font-medium">{CONTEXT.title}</h3>
-            <p className="mt-1.5 text-[15px] leading-relaxed text-white/70">{CONTEXT.text}</p>
+            <p className="mt-1.5 text-[15px] leading-relaxed text-ink/70">{CONTEXT.text}</p>
           </div>
-          <a href="#try" className={`${PILL} ${PILL_DARK} mt-8`}>
+          <a href="#try" className={`${PILL} ${PILL_GLASS} mt-8`}>
             {LABELS.tryIt}
           </a>
         </Reveal>
 
-        <Reveal delay={0.08} className={cn(CARD, "overflow-hidden bg-void-lift/60 shadow-[0_24px_64px_rgb(0_0_0/0.45)] lg:col-span-7")}>
-          <div className="flex h-11 items-center justify-center border-b border-white/10 text-sm text-white/70">
+        <Reveal delay={0.08} className={cn("overflow-hidden rounded-2xl shadow-[0_24px_64px_rgb(11_8_20/0.25)] lg:col-span-7", SCREEN)}>
+          <div className="flex h-11 items-center justify-center border-b border-white/10 text-sm text-white/75">
             {product.tryExamples[0]}
           </div>
           {/* Taller on phones, so the Step inside button sits clear of the portal's rim. */}
