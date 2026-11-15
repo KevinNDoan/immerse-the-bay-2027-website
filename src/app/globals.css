@@ -1,23 +1,134 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #f6f7f3;
-  --foreground: #173c38;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: Arial, Helvetica, sans-serif;
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  --font-sans: var(--font-sans);
+  --font-heading: var(--font-sans);
+  --color-void: var(--void);
+  --color-void-lift: var(--void-lift);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
 ::selection {
-  background: #c8e4c9;
-  color: #173c38;
+  background: #ffffff;
+  color: #07050d;
+}
+
+/* ZAP! palette, from ~/immerse-the-bay-2027/docs/design-system.md section 4.
+   White on Void. No colour yet, so nothing relies on hue to carry meaning. */
+:root {
+  --void: #07050d;
+  --void-lift: #140d26;
+  --paper: #f2f0f7;
+  --ink: #0b0814;
+
+  --background: var(--void);
+  --foreground: #ffffff;
+  --card: var(--void-lift);
+  --card-foreground: #ffffff;
+  --popover: var(--void-lift);
+  --popover-foreground: #ffffff;
+  --primary: #ffffff;
+  --primary-foreground: var(--void);
+  --secondary: rgb(255 255 255 / 8%);
+  --secondary-foreground: #ffffff;
+  --muted: rgb(255 255 255 / 8%);
+  --muted-foreground: rgb(255 255 255 / 70%);
+  --accent: rgb(255 255 255 / 10%);
+  --accent-foreground: #ffffff;
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: rgb(255 255 255 / 15%);
+  --input: rgb(255 255 255 / 15%);
+  --ring: rgb(255 255 255 / 70%);
+  --chart-1: #ffffff;
+  --chart-2: rgb(255 255 255 / 70%);
+  --chart-3: rgb(255 255 255 / 40%);
+  --chart-4: rgb(255 255 255 / 25%);
+  --chart-5: rgb(255 255 255 / 15%);
+  --radius: 1rem;
+  --sidebar: var(--void-lift);
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #ffffff;
+  --sidebar-primary-foreground: var(--void);
+  --sidebar-accent: rgb(255 255 255 / 10%);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgb(255 255 255 / 15%);
+  --sidebar-ring: rgb(255 255 255 / 70%);
+  color-scheme: dark;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  button:not(:disabled), [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  html {
+    @apply font-sans;
+    background: var(--void);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    background:
+      radial-gradient(120% 80% at 50% 0%, var(--void-lift) 0%, var(--void) 60%) fixed,
+      var(--void);
+    overflow-x: hidden;
+  }
+  h1, h2, h3 {
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  :focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 3px;
+  }
 }

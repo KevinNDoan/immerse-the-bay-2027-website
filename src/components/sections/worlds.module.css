@@ -1,0 +1,231 @@
+/* The world frame in the Worlds section: a slow, soft landscape in greys and void tones, and the
+   pending-instruction marker filling, popping and coming back. No colour. All motion stops for reduced motion. */
+
+@property --sweep {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.frame {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  border-radius: 1.5rem;
+  border: 1px solid rgb(255 255 255 / 15%);
+  background: linear-gradient(180deg, #2b2733 0%, #1b1724 38%, #0f0b17 70%, #07050d 100%);
+  isolation: isolate;
+}
+
+/* A soft light low in the sky, breathing slowly. */
+.light {
+  position: absolute;
+  left: 58%;
+  top: 30%;
+  width: 46%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 255 255 / 22%), rgb(255 255 255 / 6%) 55%, transparent);
+  animation: breathe 9s ease-in-out infinite alternate;
+}
+
+/* The world answering: a gentle lift in the light, timed with the marker's pop. Small and soft, never a flash. */
+.answer {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(60% 55% at 58% 40%, rgb(255 255 255 / 14%), transparent 70%);
+  opacity: 0;
+  animation: answer 3.2s ease-out infinite;
+}
+
+/* Each ridge is twice as wide as the frame and repeats halfway, so sliding it by half loops seamlessly. */
+.ridge {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 200%;
+  height: 100%;
+  animation: drift linear infinite;
+}
+.ridge svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.far {
+  animation-duration: 90s;
+}
+.mid {
+  animation-duration: 60s;
+}
+.near {
+  animation-duration: 38s;
+}
+
+/* Haze where the ridges meet the sky, so the layers read as distance. */
+.haze {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, transparent 35%, rgb(43 39 51 / 35%) 52%, transparent 66%),
+    linear-gradient(0deg, rgb(7 5 13 / 70%), transparent 30%);
+  pointer-events: none;
+}
+
+/* The marker and the spoken request, low in the frame. */
+.request {
+  position: absolute;
+  left: 50%;
+  bottom: 10%;
+  translate: -50% 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.marker {
+  position: relative;
+  flex: none;
+  width: clamp(36px, 6vw, 56px);
+  aspect-ratio: 1;
+  animation: pop 3.2s infinite;
+}
+.marker img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.fill {
+  -webkit-mask-image: conic-gradient(#000 var(--sweep), transparent 0);
+  mask-image: conic-gradient(#000 var(--sweep), transparent 0);
+  animation: sweep 3.2s linear infinite;
+}
+
+.pill {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem 0.5rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 15%);
+  background: rgb(7 5 13 / 80%);
+  color: #ffffff;
+  font-size: clamp(0.8125rem, 1.6vw, 1rem);
+  line-height: 1.2;
+  white-space: nowrap;
+  animation: pill 3.2s infinite;
+}
+.pill img {
+  width: 1.1em;
+  height: 1.1em;
+}
+
+@keyframes drift {
+  to {
+    translate: -50% 0;
+  }
+}
+
+@keyframes breathe {
+  from {
+    scale: 0.92;
+    opacity: 0.8;
+  }
+  to {
+    scale: 1.08;
+    opacity: 1;
+  }
+}
+
+/* One loop is 3.2 s: about two seconds of filling, a quick pop as the world answers, a short rest. */
+@keyframes sweep {
+  0% {
+    --sweep: 0deg;
+  }
+  62% {
+    --sweep: 360deg;
+  }
+  100% {
+    --sweep: 360deg;
+  }
+}
+
+@keyframes pop {
+  0% {
+    scale: 0.6;
+    opacity: 0;
+    animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  8% {
+    scale: 1;
+    opacity: 1;
+  }
+  62% {
+    scale: 1;
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  68% {
+    scale: 1.22;
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  78% {
+    scale: 0.7;
+    opacity: 0;
+  }
+  100% {
+    scale: 0.6;
+    opacity: 0;
+  }
+}
+
+@keyframes pill {
+  0% {
+    opacity: 0;
+    translate: -6px 0;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  8% {
+    opacity: 1;
+    translate: 0 0;
+  }
+  66% {
+    opacity: 1;
+  }
+  78% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes answer {
+  0%,
+  62% {
+    opacity: 0;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .light,
+  .answer,
+  .ridge,
+  .marker,
+  .fill,
+  .pill {
+    animation: none;
+  }
+  .fill {
+    --sweep: 270deg;
+  }
+}
