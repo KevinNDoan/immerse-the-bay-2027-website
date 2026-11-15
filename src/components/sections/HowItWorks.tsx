@@ -1,101 +1,104 @@
-"use client";
-
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { motion, useInView, useReducedMotion } from "motion/react";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { pamphlet, steps } from "@/content/pitch";
-import { StepsScene } from "@/components/scene";
-import { H2, SECTION, WRAP } from "./layout";
+import type { ReactNode } from "react";
+import { product, steps, worlds } from "@/content/pitch";
+import b from "./bento.module.css";
+import { CARD, CONTENT, H2, LABELS, SECTION } from "./layout";
 import { Reveal } from "./Reveal";
 
-type Step = 0 | 1 | 2 | 3;
+/** A plain <img> for the small art: these are decorative and tiny, so next/image buys nothing here. */
+function Art({ src, className, size }: { src: string; className?: string; size: number }) {
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src={`/art/${src}.png`} alt="" width={size} height={size} className={className} />;
+}
 
-/** How long each step stays open while the section plays by itself, in ms. */
-const AUTO_MS = 5000;
-const DESKTOP = "(min-width: 1024px)";
-
-function useMediaQuery(query: string) {
-  return useSyncExternalStore(
-    (onChange) => {
-      const mq = window.matchMedia(query);
-      mq.addEventListener("change", onChange);
-      return () => mq.removeEventListener("change", onChange);
-    },
-    () => window.matchMedia(query).matches,
-    () => false,
+function Star({ className }: { className?: string }) {
+  return (
+    <span className={`${b.star} ${className ?? ""}`}>
+      <Art src="star_glow" size={112} className={b.glow} />
+      <Art src="star_core" size={28} className={b.core} />
+    </span>
   );
 }
 
-/**
- * The four steps on the right; on the left a scene that follows the open step. On a desktop screen it plays
- * through the steps by itself while on screen, and stops for good the moment the visitor touches it.
- */
+const VISUALS: ReactNode[] = [
+  // Say it
+  <div key="say" className={b.sayRow}>
+    <span className={b.mic}>
+      <Art src="icon_mic" size={24} />
+    </span>
+    <span className={b.note}>
+      <Art src="note_compact" size={104} />
+      <Star className={b.noteStar} />
+      <span className={b.noteText}>{product.tryExamples[0]}</span>
+    </span>
+    <span className={b.ideas}>
+      <Art src="star_ring_dashed" size={26} />
+      <Art src="star_ring_dashed" size={26} />
+      <Art src="star_ring_dashed" size={26} />
+    </span>
+  </div>,
+  // Throw it
+  <Star key="throw" className={b.throw} />,
+  // Zap it
+  <div key="zap" className={b.zap}>
+    <Star />
+    <span className={b.link}>
+      <Art src="line_soft" size={256} className={b.soft} />
+      <Art src="line_bolt_01" size={256} className={b.bolt} />
+    </span>
+    <Star />
+  </div>,
+  // Step inside
+  <Star key="enter" className={b.enter} />,
+  // You steer
+  <div key="steer" className={b.request}>
+    <span className={b.marker}>
+      <Art src="marker_track" size={52} />
+      <Art src="marker_fill" size={52} className={b.fill} />
+    </span>
+    <span className={b.pill}>
+      <Art src="icon_mic" size={16} />
+      {LABELS.spokenRequest}
+    </span>
+  </div>,
+  // It remembers
+  <div key="remember" className="grid place-items-center">
+    <Art src="star_orbit" size={150} className={b.orbit} />
+    <Star className={b.remember} />
+  </div>,
+];
+
+const CARDS = [
+  ...steps.map((s) => ({ title: s.title, text: s.text })),
+  ...worlds.points.slice(0, 2).map((p) => ({ title: p.title, text: p.text })),
+];
+
+// React Bits' bento rhythm on 12 columns: wide, narrow, medium, then medium, wide, narrow.
+const SPANS = ["lg:col-span-5", "lg:col-span-3", "lg:col-span-4", "lg:col-span-4", "lg:col-span-5", "lg:col-span-3"];
+
+/** The loop in six cards: the four steps, then what it is like inside a world. */
 export function HowItWorks() {
-  const [step, setStep] = useState<Step>(0);
-  const [touched, setTouched] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { amount: 0.5 });
-  const reduce = useReducedMotion();
-  const desktop = useMediaQuery(DESKTOP);
-  const playing = !touched && inView && desktop && !reduce;
-
-  useEffect(() => {
-    if (!playing) return;
-    const id = window.setTimeout(() => setStep((s) => ((s + 1) % steps.length) as Step), AUTO_MS);
-    return () => window.clearTimeout(id);
-  }, [playing, step]);
-
-  const stop = () => setTouched(true);
-
   return (
-    <section id="how" aria-labelledby="how-title" className={SECTION}>
-      <div className={WRAP}>
-        <Reveal className="mb-16 text-center sm:mb-20">
-          <h2 id="how-title" className={H2}>
-            {pamphlet.howTitle}
-          </h2>
-        </Reveal>
-
-        <div ref={ref} className="grid items-start gap-10 lg:grid-cols-2 lg:gap-20">
-          <Reveal className="lg:sticky lg:top-24">
-            <StepsScene
-              step={step}
-              className="aspect-[4/3] overflow-hidden rounded-3xl border border-white/15 bg-void-lift/50 sm:aspect-square"
-            />
-          </Reveal>
-
-          <Reveal delay={0.08}>
-            <Accordion
-              type="single"
-              value={String(step)}
-              onValueChange={(v) => v && setStep(Number(v) as Step)}
-              onPointerDown={stop}
-              onKeyDown={stop}
-              className="border-t border-white/15"
+    <section id="how" aria-labelledby="how-title" className={`${CONTENT} ${SECTION}`}>
+      <Reveal>
+        <h2 id="how-title" className={H2}>
+          {LABELS.howItWorks}
+        </h2>
+      </Reveal>
+      <div className="mt-10 grid gap-3 sm:mt-12 sm:grid-cols-2 sm:gap-4 lg:grid-cols-12">
+        {CARDS.map((c, i) => (
+          <Reveal key={c.title} delay={(i % 3) * 0.05} className={`${CARD} flex flex-col overflow-hidden ${SPANS[i]}`}>
+            <div
+              aria-hidden
+              className="h-44 border-b border-white/10 bg-[radial-gradient(80%_70%_at_50%_45%,rgb(255_255_255/0.05),transparent_70%)] sm:h-52"
             >
-              {steps.map((s, i) => (
-                <AccordionItem key={s.title} value={String(i)} className="relative border-b border-white/15">
-                  <AccordionTrigger className="items-center rounded-none py-6 text-[clamp(1.75rem,3.2vw,2.5rem)] leading-tight font-medium tracking-[-0.035em] text-white/50 hover:text-white/80 hover:no-underline aria-expanded:text-white **:data-[slot=accordion-trigger-icon]:hidden">
-                    {s.title}
-                  </AccordionTrigger>
-                  <AccordionContent className="max-w-[46ch] pb-7 text-lg leading-relaxed text-white/70">
-                    {s.text}
-                  </AccordionContent>
-                  {playing && step === i ? (
-                    <motion.span
-                      key={step}
-                      aria-hidden
-                      className="absolute inset-x-0 -bottom-px h-px origin-left bg-white"
-                      initial={{ scaleX: 0 }}
-                      animate={{ scaleX: 1 }}
-                      transition={{ duration: AUTO_MS / 1000, ease: "linear" }}
-                    />
-                  ) : null}
-                </AccordionItem>
-              ))}
-            </Accordion>
+              <div className={b.stage}>{VISUALS[i]}</div>
+            </div>
+            <div className="flex flex-1 flex-col p-5 sm:p-6">
+              <h3 className="text-lg font-medium tracking-[-0.015em]">{c.title}</h3>
+              <p className="mt-2 text-[15px] leading-relaxed text-white/70">{c.text}</p>
+            </div>
           </Reveal>
-        </div>
+        ))}
       </div>
     </section>
   );

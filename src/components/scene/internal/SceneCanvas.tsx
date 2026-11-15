@@ -11,6 +11,7 @@ import { Canvas, type CanvasProps } from "@react-three/fiber";
 import { cn } from "@/lib/utils";
 import { loadArt } from "./art";
 import { SceneFallback } from "./SceneFallback";
+import { OverlayContext, OverlayLayer, createOverlayStore } from "./overlay";
 
 function hasWebGL(): boolean {
   try {
@@ -39,7 +40,7 @@ function ReadySignal({ onReady }: { onReady: () => void }) {
 }
 
 type SceneCanvasProps = {
-  variant: "hero" | "steps" | "tryit";
+  variant: "hero" | "steps" | "tryit" | "portal" | "reel";
   camera: CanvasProps["camera"];
   className?: string;
   /** Class for the <canvas> wrapper R3F creates. */
@@ -47,19 +48,40 @@ type SceneCanvasProps = {
   children: ReactNode;
   /** Called with the container so scenes can attach native listeners. */
   containerRef?: React.RefObject<HTMLDivElement | null>;
+  /** Told when the canvas scrolls into or out of view. */
+  onVisible?: (visible: boolean) => void;
 };
 
-export function SceneCanvas({ variant, camera, className, canvasClassName, children, containerRef }: SceneCanvasProps) {
+export function SceneCanvas({
+  variant,
+  camera,
+  className,
+  canvasClassName,
+  children,
+  containerRef,
+  onVisible,
+}: SceneCanvasProps) {
   const [webgl] = useState(hasWebGL);
   const [visible, setVisible] = useState(() => typeof IntersectionObserver === "undefined");
   const [ready, setReady] = useState(false);
+  const [overlay] = useState(createOverlayStore);
   const localRef = useRef<HTMLDivElement>(null);
   const box = containerRef ?? localRef;
+  const onVisibleRef = useRef(onVisible);
+  useEffect(() => {
+    onVisibleRef.current = onVisible;
+  }, [onVisible]);
 
   useEffect(() => {
     const el = box.current;
     if (!el || typeof IntersectionObserver === "undefined") return;
-    const io = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting), { rootMargin: "120px 0px" });
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        setVisible(entry.isIntersecting);
+        onVisibleRef.current?.(entry.isIntersecting);
+      },
+      { rootMargin: "120px 0px" },
+    );
     io.observe(el);
     return () => io.disconnect();
   }, [box]);
@@ -81,20 +103,23 @@ export function SceneCanvas({ variant, camera, className, canvasClassName, child
       </div>
       {webgl ? (
         <CanvasBoundary fallback={fallback}>
-          <Canvas
-            className={canvasClassName}
-            style={{ position: "absolute", inset: 0 }}
-            dpr={[1, 2]}
-            frameloop={visible ? "always" : "never"}
-            camera={camera}
-            gl={{ alpha: true, antialias: true, powerPreference: "low-power", premultipliedAlpha: true }}
-            onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
-          >
-            <Suspense fallback={null}>
-              {children}
-              <ReadySignal onReady={markReady} />
-            </Suspense>
-          </Canvas>
+          <OverlayContext value={overlay}>
+            <Canvas
+              className={canvasClassName}
+              style={{ position: "absolute", inset: 0 }}
+              dpr={[1, 2]}
+              frameloop={visible ? "always" : "never"}
+              camera={camera}
+              gl={{ alpha: true, antialias: true, powerPreference: "low-power", premultipliedAlpha: true }}
+              onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
+            >
+              <Suspense fallback={null}>
+                {children}
+                <ReadySignal onReady={markReady} />
+              </Suspense>
+            </Canvas>
+          </OverlayContext>
+          <OverlayLayer store={overlay} />
         </CanvasBoundary>
       ) : null}
     </div>

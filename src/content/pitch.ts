@@ -72,7 +72,7 @@ export const whyXr = {
     },
     {
       title: "Presence beats description",
-      text: "A screen shows you a volcano. A headset puts you next to one. Being there is what makes a topic stick.",
+      text: "A screen shows you a volcano. A headset puts you next to one, and gives the topic a place you can remember it by.",
     },
   ] satisfies Claim[],
 } as const;
@@ -92,8 +92,8 @@ export const builtOn = {
 
 export const questions: readonly Question[] = [
   {
-    q: "Why does this need a headset?",
-    a: "Because the point is space. A 2D graph app can show links, but it cannot let you place ideas around your body, reach for them, or stand inside one. Those are the parts that help a topic stick.",
+    q: "What happens when the constellation gets big?",
+    a: "You reshape it with your hands. Pull it closer, stretch it from desk size to room size, or tap a star to bring it and its neighbours to you. Notes fade with distance, so only the ideas near you carry text.",
   },
   {
     q: "Is the generated world more than eye candy?",
@@ -101,7 +101,7 @@ export const questions: readonly Question[] = [
   },
   {
     q: "Will it make people feel sick?",
-    a: "We designed against it. Nothing is fixed to your view, nothing comes closer than 30 cm, nothing flashes across the whole view, and in the void you move by walking and pulling the constellation, not with the sticks.",
+    a: "We designed against it. In the void you move by walking and pulling the constellation, never with the sticks. Inside a world the sticks steer the video, while the dome around you stays still. Nothing is fixed to your view, comes closer than 30 cm, or flashes across the whole view.",
   },
   {
     q: "The world takes two seconds to respond. Is that a problem?",
@@ -109,7 +109,7 @@ export const questions: readonly Question[] = [
   },
   {
     q: "What if the Wi-Fi or Orbis goes down?",
-    a: "We bring our own router so the headset and laptop always reach each other. If Orbis is unreachable, a recorded world plays in its place and the rest of ZAP! keeps working.",
+    a: "We bring our own router, and if a network blocks the headset from the laptop, a USB cable works instead. If Orbis is unreachable, a recorded world plays in its place and the rest of ZAP! keeps working.",
   },
   {
     q: "Where does my voice go?",
@@ -121,15 +121,15 @@ export const questions: readonly Question[] = [
   },
   {
     q: "Who is it for?",
-    a: "Anyone studying on their own: students before an exam, and curious people working through a subject for fun. Self-directed learning is where we see the most good.",
+    a: "Self-directed learners working through subjects made of connected ideas, like biology, history or how a system fits together. That kind of learning is where seeing the links helps most, and where we see the most good.",
   },
   {
-    q: "Can I use it today?",
-    a: "Not yet. ZAP! is a prototype built at Immerse the Bay 2027. Come try it at our table.",
+    q: "Can you trust what the world shows?",
+    a: "Treat it as a place, not a source. Worlds are there for presence and memory. The facts live on the note, as a short summary you can read and check, and the world is the scene you remember them by.",
   },
   {
     q: "What comes next?",
-    a: "Colour, spatial sound by Satie, hand tracking, sharing a constellation with a friend, importing your existing notes, and doorways from one world straight into a connected one.",
+    a: "Sharing a constellation with a friend, importing your existing notes, spatial sound by Satie, hand tracking, doorways from one world straight into a connected one, and colour.",
   },
 ];
 
@@ -150,3 +150,13 @@ export const pamphlet = {
   techTitle: "Built on",
   footer: "Immerse the Bay 2027, Living Worlds track.",
 } as const;
+
+/**
+ * The demo video under the hero. Record a short headset capture, drop it in public/media/ and set `src`
+ * (and ideally `poster`, a still from it). Until then the page plays the live 3D steps reel in its place.
+ */
+export const demoVideo: { src: string | null; poster: string | null; label: string } = {
+  src: null,
+  poster: null,
+  label: "ZAP! in the headset: saying a topic, throwing it, zapping two stars together and stepping inside a world.",
+};

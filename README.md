@@ -6,7 +6,7 @@ The product itself lives in `~/immerse-the-bay-2027`. Its `docs/design-system.md
 
 ## Getting started
 
-Requires Node.js 20.9 or newer.
+Requires Node.js 22 or newer.
 
 ```sh
 npm install
@@ -35,7 +35,7 @@ npm run check:copy  # Fail on em dashes, dot separators, emoji or all-caps label
 
 ## Environment
 
-- `NEXT_PUBLIC_SITE_URL`: the public address of the site, with no trailing slash. Every QR code points to `<this>/pamphlet`. It defaults to `http://localhost:3000`, so set it before printing anything.
+- `NEXT_PUBLIC_SITE_URL`: the public address of the site, with no trailing slash. Every QR code points to `<this>/pamphlet`, and the PDF bakes it in at build time, so it must be set when you build (on Vercel, as a project environment variable). Without it the codes point to `http://localhost:3000` and the build prints a warning.
 
 ## Project structure
 

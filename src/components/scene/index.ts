@@ -5,3 +5,5 @@
 export { HeroConstellation, type HeroConstellationProps } from "./HeroConstellation";
 export { StepsScene, type StepsSceneProps } from "./StepsScene";
 export { TryItDemo, type TryItDemoProps } from "./TryItDemo";
+export { PortalScene, type PortalSceneProps } from "./PortalScene";
+export { DemoReel, type DemoReelProps } from "./DemoReel";

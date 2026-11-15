@@ -9,14 +9,13 @@
 
 import { useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
-import { Html } from "@react-three/drei";
 import { SceneCanvas } from "../internal/SceneCanvas";
 import { Star, type StarFrame } from "../internal/Star";
 import { Link, type PointGetter } from "../internal/Link";
 import { Note } from "../internal/Note";
 import { TIMING, clamp01, damp, easeOutBack, now, stepSpring, usePrefersReducedMotion, type Spring } from "../internal/motion";
 
-type Step = 0 | 1 | 2 | 3;
+export type Step = 0 | 1 | 2 | 3;
 export type StepsCanvasProps = { step: Step; className?: string };
 
 const CAM_Z = 8;
@@ -105,7 +104,19 @@ function makeRuntime(step: Step): Runtime {
   };
 }
 
-function Scene({ step, reduced }: { step: Step; reduced: boolean }) {
+/** The steps illustration, without its canvas. `drift` adds a slow handheld camera sway (demo reel). */
+export function StepsWorld({
+  step,
+  reduced,
+  drift = false,
+  distance = CAM_Z,
+}: {
+  step: Step;
+  reduced: boolean;
+  drift?: boolean;
+  /** Camera distance for steps 0 to 2. Wide boxes can come closer. */
+  distance?: number;
+}) {
   const rt = useRef<Runtime | null>(null);
   // Notes are sized in pixels, so small boxes get the small note and a shorter drop.
   const boxH = useThree((s) => s.size.height);
@@ -113,7 +124,10 @@ function Scene({ step, reduced }: { step: Step; reduced: boolean }) {
   const drop = Math.min(1, Math.max(0.55, boxH / 480));
 
   const get = (): Runtime => {
-    if (!rt.current) rt.current = makeRuntime(step);
+    if (!rt.current) {
+      rt.current = makeRuntime(step);
+      if (step !== 3) rt.current.cz.x = distance;
+    }
     return rt.current;
   };
 
@@ -131,7 +145,7 @@ function Scene({ step, reduced }: { step: Step; reduced: boolean }) {
       r.prevStep = step;
     }
     const h = HERO[step];
-    const c = CAMERA[step];
+    const c = step === 3 ? CAMERA[3] : ([0, 0, distance] as const);
     if (reduced) {
       r.hx.x = h.p[0];
       r.hy.x = h.p[1];
@@ -166,6 +180,12 @@ function Scene({ step, reduced }: { step: Step; reduced: boolean }) {
     r.noteScale = damp(r.noteScale, step === 0 ? 1 : 0.92, rate, dt);
     r.mic = damp(r.mic, step === 0 ? 1 : 0, rate, dt);
     state.camera.position.set(r.cx.x, r.cy.x, r.cz.x);
+    if (drift && !reduced) {
+      const sway = 1 - r.inside;
+      state.camera.position.x += 0.22 * Math.sin(t * 0.31) * sway;
+      state.camera.position.y += 0.12 * Math.sin(t * 0.23 + 1) * sway;
+      state.camera.rotation.z = 0.012 * Math.sin(t * 0.17) * sway;
+    }
   });
 
   const heroPos: PointGetter = (out, t) => {
@@ -246,35 +266,17 @@ function Scene({ step, reduced }: { step: Step; reduced: boolean }) {
             o.y = (26 + 30 * (1 - r.settle)) * drop;
           }}
         />
-        <MicHint opacity={() => get().mic} />
+        <Note
+          variant="mic"
+          middle
+          offsetX={-90}
+          drive={(o) => {
+            o.opacity = get().mic;
+            o.scale = 1;
+          }}
+        />
       </Star>
     </>
-  );
-}
-
-/** Mic icon to the left of the star while it is being said. */
-function MicHint({ opacity }: { opacity: () => number }) {
-  const el = useRef<HTMLDivElement>(null);
-  useFrame(() => {
-    const d = el.current;
-    if (!d) return;
-    const o = opacity();
-    d.style.opacity = o < 0.01 ? "0" : String(o);
-    d.style.visibility = o < 0.01 ? "hidden" : "visible";
-  });
-  return (
-    <Html zIndexRange={[20, 0]} pointerEvents="none" style={{ pointerEvents: "none" }}>
-      <div
-        ref={el}
-        aria-hidden="true"
-        className="pointer-events-none relative grid size-10 -translate-x-[calc(100%+64px)] -translate-y-1/2 place-items-center rounded-full bg-white shadow-[0_0_24px_rgb(255_255_255/0.35)]"
-        style={{ opacity: 0, visibility: "hidden" }}
-      >
-        <span className="absolute inset-0 rounded-full border-2 border-white/60 motion-safe:animate-ping" />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/art/icon_mic.png" alt="" width={20} height={20} className="size-6 invert" />
-      </div>
-    </Html>
   );
 }
 
@@ -282,7 +284,7 @@ export default function StepsCanvas({ step, className }: StepsCanvasProps) {
   const reduced = usePrefersReducedMotion();
   return (
     <SceneCanvas variant="steps" className={className} camera={{ position: [0, 0, CAM_Z], fov: 40, near: 0.05, far: 40 }}>
-      <Scene step={step} reduced={reduced} />
+      <StepsWorld step={step} reduced={reduced} />
     </SceneCanvas>
   );
 }

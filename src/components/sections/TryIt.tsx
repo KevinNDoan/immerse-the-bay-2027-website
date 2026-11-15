@@ -1,24 +1,23 @@
-import { tryIt } from "@/content/pitch";
 import { TryItDemo } from "@/components/scene";
-import { H2, LEAD, SECTION, WRAP } from "./layout";
+import { tryIt } from "@/content/pitch";
+import { CARD, CONTENT, SECTION } from "./layout";
 import { Reveal } from "./Reveal";
 
-/** A small version of the void, right in the page. */
+/** One large card holding the in-browser void, titled in its footer. */
 export function TryIt() {
   return (
-    <section id="try" aria-labelledby="try-title" className={SECTION}>
-      <div className={WRAP}>
-        <Reveal className="mx-auto max-w-2xl text-center">
-          <h2 id="try-title" className={H2}>
+    <section id="try" aria-labelledby="try-title" className={`${CONTENT} ${SECTION}`}>
+      <Reveal className={`${CARD} overflow-hidden`}>
+        <div className="p-3 sm:p-5">
+          <TryItDemo />
+        </div>
+        <div className="flex flex-col gap-1 border-t border-white/10 px-5 py-4 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6 sm:px-6">
+          <h2 id="try-title" className="text-xl font-medium tracking-[-0.02em]">
             {tryIt.title}
           </h2>
-          <p className={`${LEAD} mt-6`}>{tryIt.text}</p>
-        </Reveal>
-        <Reveal delay={0.08} className="mt-14 sm:mt-16">
-          <TryItDemo />
-        </Reveal>
-        <p className="mt-6 text-center text-sm text-white/70">{tryIt.note}</p>
-      </div>
+          <p className="text-sm text-white/70">{tryIt.note}</p>
+        </div>
+      </Reveal>
     </section>
   );
 }

@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 type FallbackStar = { x: number; y: number; r: number; o: number };
 
-const LAYOUTS: Record<"hero" | "steps" | "tryit", FallbackStar[]> = {
+const LAYOUTS: Record<"hero" | "steps" | "tryit" | "portal" | "reel", FallbackStar[]> = {
   hero: [
     { x: 62, y: 30, r: 7, o: 0.9 },
     { x: 74, y: 48, r: 10, o: 1 },
@@ -23,6 +23,19 @@ const LAYOUTS: Record<"hero" | "steps" | "tryit", FallbackStar[]> = {
     { x: 70, y: 36, r: 5, o: 0.7 },
     { x: 58, y: 64, r: 10, o: 1 },
     { x: 24, y: 58, r: 4, o: 0.5 },
+  ],
+  portal: [
+    { x: 50, y: 50, r: 22, o: 0.9 },
+    { x: 50, y: 50, r: 22, o: 0.9 },
+    { x: 18, y: 24, r: 3, o: 0.4 },
+    { x: 84, y: 72, r: 3, o: 0.35 },
+  ],
+  reel: [
+    { x: 40, y: 40, r: 7, o: 0.8 },
+    { x: 56, y: 30, r: 4, o: 0.6 },
+    { x: 66, y: 46, r: 5, o: 0.7 },
+    { x: 52, y: 64, r: 10, o: 1 },
+    { x: 30, y: 58, r: 4, o: 0.5 },
   ],
   tryit: [
     { x: 38, y: 42, r: 9, o: 1 },
