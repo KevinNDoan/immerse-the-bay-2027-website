@@ -50,6 +50,20 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
       const gesture = new SectionGesture();
       let moving = false;
       let disposed = false;
+      let movingFailsafe = 0;
+      /**
+       * Mirrored on <html> as the start time, so the 3D canvases never build mid-move (see UniverseCanvas).
+       * Lenis can drop a move without calling onComplete (a middle click resets it), so it also clears
+       * itself shortly after any move would have finished; otherwise keys and wheel would stay locked.
+       */
+      const setMoving = (value: boolean) => {
+        moving = value;
+        window.clearTimeout(movingFailsafe);
+        if (value) {
+          root.dataset.zapMoving = String(Date.now());
+          movingFailsafe = window.setTimeout(() => setMoving(false), DURATION * 1000 + 400);
+        } else delete root.dataset.zapMoving;
+      };
 
       const getStops = () => sectionStops(
         sections.map(section => {
@@ -77,7 +91,9 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
           if (!event.cancelable) return false;
           event.preventDefault();
           root.dataset.zapScroll = "controlled";
-          const direction = gesture.sample(deltaY, performance.now(), moving);
+          // The event's own time, not now: after a stalled frame the queued tail of one swipe would
+          // otherwise look like a fresh swipe and skip a second section.
+          const direction = gesture.sample(deltaY, event.timeStamp, moving);
           if (direction) goTo(nextSectionStop(getStops(), lenis.scroll, direction));
           return false;
         },
@@ -88,14 +104,14 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
         root.dataset.zapScroll = "controlled";
         lenis.start();
         lenis.resize();
-        moving = true;
+        setMoving(true);
         lenis.scrollTo(position, {
           duration: DURATION,
           easing: ease,
           immediate,
           force: true,
           lock: true,
-          onComplete: () => { moving = false; },
+          onComplete: () => setMoving(false),
         });
       }
 
@@ -145,7 +161,7 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
         const wasStopped = lenis.isStopped;
         lenis.stop();
         if (!wasStopped) lenis.start();
-        moving = false;
+        setMoving(false);
         gesture.reset();
       }
 
@@ -183,8 +199,10 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
         window.removeEventListener("resize", cancelMotion);
         window.removeEventListener("touchstart", onTouchStart);
         document.removeEventListener("focusin", onFocus);
+        window.clearTimeout(movingFailsafe);
         lenis.destroy();
         delete root.dataset.zapScroll;
+        delete root.dataset.zapMoving;
       };
     }
 

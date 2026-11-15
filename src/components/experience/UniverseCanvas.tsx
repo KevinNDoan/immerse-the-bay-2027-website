@@ -199,23 +199,84 @@ function Scene(props: UniverseProps) {
   </>;
 }
 
+/**
+ * Building a canvas (WebGL context, glass shaders, environment map) blocks the page for about 300 ms.
+ * Doing that when a section scrolls into view froze every slide change, and worse on the way back up,
+ * because the canvas above had been thrown away. So each canvas is built once, one at a time, while the
+ * page is idle and no slide change is running, and then kept.
+ */
+const warmQueue: Array<() => void> = [];
+let warming = false;
+
+/** SmoothScroll stamps the start time of a slide change on <html>; a stamp older than any move is stale. */
+function slideMoving() {
+  const started = Number(document.documentElement.dataset.zapMoving);
+  return started > 0 && Date.now() - started < 1500;
+}
+
+function unqueue(build: () => void) {
+  const at = warmQueue.indexOf(build);
+  if (at >= 0) warmQueue.splice(at, 1);
+}
+
+function pumpWarmQueue() {
+  if (warming || !warmQueue.length) return;
+  warming = true;
+  const idle = window.requestIdleCallback ?? ((run: () => void) => window.setTimeout(run, 120));
+  const attempt = () => idle(() => {
+    // Never build while a slide is moving: wait for it to land.
+    if (slideMoving()) { window.setTimeout(attempt, 250); return; }
+    warmQueue.shift()?.();
+    // Leave time for that canvas's first render before starting the next one.
+    window.setTimeout(() => { warming = false; pumpWarmQueue(); }, 450);
+  }, { timeout: 1500 });
+  attempt();
+}
+
+function warmLater(build: () => void, first = false) {
+  unqueue(build);
+  if (first) warmQueue.unshift(build);
+  else warmQueue.push(build);
+  pumpWarmQueue();
+}
+
 export default function UniverseCanvas(props: UniverseProps) {
   const container = useRef<HTMLDivElement>(null);
-  const [nearby, setNearby] = useState(false);
+  const [built, setBuilt] = useState(false);
+  const [onScreen, setOnScreen] = useState(false);
   const [available, setAvailable] = useState(true);
   const [pageVisible, setPageVisible] = useState(true);
   useEffect(() => {
-    if (!container.current) return;
-    const observer = new IntersectionObserver(([entry]) => setNearby(entry.isIntersecting), { rootMargin: "150px" });
-    observer.observe(container.current);
+    const element = container.current;
+    if (!element) return;
+    // Phones and reduced motion scroll natively and have less memory to spare: there, keep only the canvases
+    // within a screen of the view and drop the rest, as before. Elsewhere, warm every canvas up and keep it.
+    const keepAll = window.matchMedia("(pointer: fine)").matches && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const build = () => { unqueue(build); setBuilt(true); };
+    if (keepAll) warmLater(build);
+    const near = new IntersectionObserver(([entry]) => {
+      if (!keepAll) setBuilt(entry.isIntersecting);
+      // Someone is outpacing the warm-up: move this canvas to the front, still never mid-move.
+      else if (entry.isIntersecting) warmLater(build, true);
+    }, { rootMargin: "100% 0px" });
+    const visible = new IntersectionObserver(([entry]) => {
+      setOnScreen(entry.isIntersecting);
+      // Already on screen and still empty: build now rather than show nothing.
+      if (keepAll && entry.intersectionRatio > 0.5) build();
+    }, { threshold: [0, 0.5] });
+    near.observe(element);
+    visible.observe(element);
     const onVisibility = () => setPageVisible(!document.hidden);
     document.addEventListener("visibilitychange", onVisibility);
-    return () => { observer.disconnect(); document.removeEventListener("visibilitychange", onVisibility); };
+    return () => { unqueue(build); near.disconnect(); visible.disconnect(); document.removeEventListener("visibilitychange", onVisibility); };
   }, []);
+  // Off screen it stays built but idle: "demand" draws once when built (compiling its shaders then, not
+  // on arrival) and again only when its props change.
+  const frameloop = !pageVisible ? "never" : onScreen && !props.paused ? "always" : "demand";
   return <div ref={container} className="zap-canvas" aria-hidden="true">
-    {nearby && available && <SceneBoundary onFailure={() => props.onReady?.(false)}><Canvas
+    {built && available && <SceneBoundary onFailure={() => props.onReady?.(false)}><Canvas
       dpr={[1, 1.5]} camera={{ position: [0, 0, 16], fov: 35 }}
-      frameloop={!pageVisible ? "never" : props.paused ? "demand" : "always"}
+      frameloop={frameloop}
       gl={{ alpha: true, antialias: true, powerPreference: "low-power" }}
       fallback={<span />}
       onCreated={({ gl }) => {
