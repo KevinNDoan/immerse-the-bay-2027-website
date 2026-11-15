@@ -43,9 +43,28 @@ export const steps: readonly Step[] = [
   },
 ];
 
-/** The lead line over the dark product rows. */
-export const stepsLead =
-  "One headset and four moves. Say a topic, throw it into place, zap it to the next idea, then step inside it.";
+/** ZAP! has two places to be (design-system.md, "The two spaces"), shown as Harvey shows its two audiences. */
+export const spaces = {
+  title: "Two spaces, one study session",
+  text: "You build your understanding in the void, then walk into any part of it.",
+  items: [
+    {
+      title: "The void",
+      text: "A dark, quiet space around you. Say topics, throw them where they belong, and zap them together into a constellation of everything you are learning.",
+      cta: "Try the void",
+      href: "#try",
+    },
+    {
+      title: "A world",
+      text: "Pull any star to your face and the void gives way to a moving world of that topic, generated live by Orbis. Steer it, then press a button to come back.",
+      cta: "Step inside",
+      href: "#step-inside",
+    },
+  ],
+} as const;
+
+/** The heading over the row of parts, where Harvey shows its customers' logos. */
+export const builtOnHeading = "Built at Immerse the Bay 2027 on";
 
 /** A few true numbers, Harvey-style. Each one is backed by the answers further down the page. */
 export const numbers = {
@@ -54,7 +73,7 @@ export const numbers = {
     { value: "4", label: "moves to learn: say it, throw it, zap it, step inside" },
     { value: "2 s", label: "about how long a world takes to answer what you ask" },
     { value: "30 cm", label: "the closest anything in ZAP! ever comes to your face" },
-    { value: "$0.58", label: "a minute on Orbis, and only while you are inside a world" },
+    { value: "$0.58", label: "a minute on Orbis Stable, and only while you are inside a world" },
   ],
 } as const;
 

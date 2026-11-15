@@ -8,7 +8,7 @@ import { DemoReel } from "@/components/scene";
 import { cn } from "@/lib/utils";
 import { CONTENT, LABELS, PILL, SCREEN } from "./layout";
 
-const FRAME = `relative aspect-video overflow-hidden rounded-2xl ${SCREEN} shadow-[0_24px_64px_rgb(11_8_20/0.25)]`;
+const FRAME = `relative w-full overflow-hidden rounded-2xl ${SCREEN}`;
 
 /**
  * The demo, right under the hero. With a recorded video it plays muted and looping, with a pause button;
@@ -16,16 +16,15 @@ const FRAME = `relative aspect-video overflow-hidden rounded-2xl ${SCREEN} shado
  */
 export function Demo() {
   return (
-    <section id="demo" aria-labelledby="demo-caption" className={`${CONTENT} flex flex-col justify-center py-4 md:min-h-svh md:py-20`}>
-      {/* As wide as the column, but never taller than the screen leaves room for, so it fits as one stop. */}
-      <div className="mx-auto w-full max-w-[calc((100svh-11rem)*16/9)]">
-        <div className={FRAME}>
-          {demoVideo.src ? <DemoVideo src={demoVideo.src} poster={demoVideo.poster} /> : <DemoReel className="absolute inset-0" />}
-        </div>
-        <p id="demo-caption" className="mt-4 text-sm leading-relaxed text-ink/70">
-          {demoVideo.label}
-        </p>
+    <section id="demo" aria-labelledby="demo-caption" className="flex flex-col justify-center px-4 pb-4 md:min-h-svh md:pt-[88px] md:pb-6">
+      {/* Harvey's hero media: nearly edge to edge, 16px in from each side, and never taller than the screen
+          leaves room for, so it fits as one stop. */}
+      <div className={`${FRAME} h-[min(calc(100svh-10rem),calc((100vw-2rem)*0.5625))] min-h-64`}>
+        {demoVideo.src ? <DemoVideo src={demoVideo.src} poster={demoVideo.poster} /> : <DemoReel className="absolute inset-0" />}
       </div>
+      <p id="demo-caption" className={`${CONTENT} mt-4 text-sm leading-relaxed text-ink/70`}>
+        {demoVideo.label}
+      </p>
     </section>
   );
 }

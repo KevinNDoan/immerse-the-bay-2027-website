@@ -21,9 +21,6 @@ export const H1 = "text-[clamp(3rem,6.6vw,5.5rem)] leading-[0.98] font-normal tr
 /** A section heading: quieter than the title, regular weight, sitting in the left columns. */
 export const H2 = "text-[clamp(1.875rem,3.2vw,2.625rem)] leading-[1.08] font-normal tracking-[-0.03em] text-balance";
 
-/** A feature name in the dark rows: large and light, like Harvey's product names. */
-export const H3_FEATURE = "text-[clamp(2.25rem,4.4vw,3.5rem)] leading-[1] font-normal tracking-[-0.035em]";
-
 /** The headings-left, content-right split most sections use: 5 columns, a gap, then 6. */
 export const SPLIT_LEFT = "lg:col-span-5";
 export const SPLIT_RIGHT = "lg:col-span-6 lg:col-start-7";

@@ -86,7 +86,7 @@ export function TryItDemo({ className }: TryItDemoProps) {
         ))}
       </div>
 
-      <div className="relative mt-4 aspect-[4/5] w-full screen overflow-hidden rounded-3xl bg-[radial-gradient(120%_90%_at_50%_0%,rgb(255_255_255/0.07),transparent_60%),linear-gradient(180deg,#140d26,#07050d)] sm:aspect-[16/10] sm:max-h-[max(20rem,calc(100svh-27rem))]">
+      <div className="relative mt-4 aspect-[4/5] w-full screen overflow-hidden rounded-3xl bg-[radial-gradient(120%_90%_at_50%_0%,rgb(255_255_255/0.07),transparent_60%),linear-gradient(180deg,#140d26,#07050d)] sm:aspect-[16/10] sm:max-h-[max(20rem,calc(100svh-33rem))]">
         <TryItCanvas state={state} dispatch={dispatch} onBox={onBox} />
         {state.stars.length === 0 ? (
           <p className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 px-6 text-center text-sm text-white/60">

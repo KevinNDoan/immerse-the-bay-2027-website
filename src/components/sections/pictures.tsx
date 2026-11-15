@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { product } from "@/content/pitch";
 import { LABELS } from "./layout";
 import b from "./pictures.module.css";
@@ -86,7 +86,14 @@ const PICTURES: Record<PictureName, ReactNode> = {
 export function Picture({ name, scale = 1 }: { name: PictureName; scale?: number }) {
   return (
     <div aria-hidden className={b.stage}>
-      <div style={scale === 1 ? undefined : { transform: `scale(${scale})` }}>{PICTURES[name]}</div>
+      {/* A grid, so the pictures' inline stars are blockified and keep their set size, as in the card stage. */}
+      {/* Enlarged less on phones, where the panels are narrow and the wider pictures would be clipped. */}
+      <div
+        className="grid w-full place-items-center [transform:scale(min(var(--s),1.15))] sm:[transform:scale(var(--s))]"
+        style={{ "--s": scale } as CSSProperties}
+      >
+        {PICTURES[name]}
+      </div>
     </div>
   );
 }

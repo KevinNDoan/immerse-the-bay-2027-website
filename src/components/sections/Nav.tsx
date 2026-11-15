@@ -3,11 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { ArrowUpRight } from "lucide-react";
-import { motion, useMotionValueEvent, useReducedMotion, useScroll } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { SPRING } from "@/lib/motion";
 import { cn } from "@/lib/utils";
-import { CONTENT, LABELS } from "./layout";
+import { LABELS, PILL, PILL_PRIMARY } from "./layout";
 
 const LINKS = [
   { id: "how", label: LABELS.howItWorks },
@@ -15,6 +14,26 @@ const LINKS = [
   { id: "step-inside", label: LABELS.stepInside },
   { id: "questions", label: LABELS.questions },
 ] as const;
+
+/**
+ * Whether the bar is over the dark half. A band at the top of the viewport, about as tall as the bar, reads
+ * the data-tone of whichever section (or the footer) is under it.
+ */
+function useDarkUnderBar() {
+  const [dark, setDark] = useState(false);
+  useEffect(() => {
+    const parts = [...document.querySelectorAll<HTMLElement>("main > section, body footer")];
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) if (e.isIntersecting) setDark((e.target as HTMLElement).dataset.tone === "dark");
+      },
+      { rootMargin: "0px 0px -92% 0px" },
+    );
+    parts.forEach((p) => io.observe(p));
+    return () => io.disconnect();
+  }, []);
+  return dark;
+}
 
 /** The id of the section crossing the middle of the screen, or null between sections. */
 function useActiveSection() {
@@ -35,32 +54,30 @@ function useActiveSection() {
 }
 
 /**
- * A quiet bar fixed to the top: the wordmark, the four sections in the middle, the pamphlet on the right.
- * It is clear over the hero and fades in a blurred backing once you scroll. The current section gets a soft
- * pill that slides between links, which also tells the room where the pitch is.
+ * Harvey's bar: full width and 72px tall, on a solid backing the colour of the page under it. The wordmark
+ * sits at the left edge, the four sections in the middle, and two buttons at the right edge, one outlined and
+ * one filled. Over the dark half it turns dark. The current section gets a thin underline that slides between
+ * links, which also tells the room where the pitch is.
  */
 export function Nav() {
-  const { scrollY } = useScroll();
   const reduce = useReducedMotion();
-  const [scrolled, setScrolled] = useState(false);
-  useMotionValueEvent(scrollY, "change", (y) => setScrolled(y > 8));
   const active = useActiveSection();
+  const dark = useDarkUnderBar();
 
   return (
-    <header className="fixed inset-x-0 top-0 z-40">
-      <div
-        aria-hidden
-        className={cn(
-          "absolute inset-0 bg-white/30 shadow-[inset_0_-1px_0_rgb(255_255_255/0.6),0_10px_30px_rgb(11_8_20/0.08)] backdrop-blur-[28px] backdrop-saturate-150 transition-opacity duration-300",
-          scrolled ? "opacity-100" : "opacity-0",
-        )}
-      />
-      <div className={cn(CONTENT, "relative grid h-16 grid-cols-[1fr_auto] items-center md:grid-cols-[1fr_auto_1fr]")}>
+    <header
+      data-tone={dark ? "dark" : undefined}
+      className={cn(
+        "fixed inset-x-0 top-0 z-40 transition-colors duration-300",
+        dark ? "bg-void text-white" : "bg-[#e3e7ec]/90 text-ink backdrop-blur-xl backdrop-saturate-150",
+      )}
+    >
+      <div className="relative grid h-[72px] grid-cols-[1fr_auto] items-center gap-4 px-5 sm:px-8 md:grid-cols-[1fr_auto_1fr]">
         <Link href="#top" aria-label={LABELS.home} className="flex min-h-11 items-center justify-self-start rounded-md">
           <Image src="/art/zap-wordmark.png" alt="" width={819} height={340} preload className="-ml-1 h-9 w-auto" />
         </Link>
 
-        <nav aria-label="Sections" className="hidden items-center md:flex">
+        <nav aria-label="Sections" className="hidden items-center gap-1 md:flex">
           {LINKS.map((l) => {
             const on = active === l.id;
             return (
@@ -69,34 +86,39 @@ export function Nav() {
                 href={`#${l.id}`}
                 aria-current={on ? "location" : undefined}
                 className={cn(
-                  "relative flex min-h-11 items-center px-3.5 text-sm transition-colors duration-150",
-                  on ? "text-ink" : "text-ink/65 hover:text-ink",
+                  "relative flex min-h-11 items-center px-3.5 text-[15px] transition-colors duration-150",
+                  dark ? (on ? "text-white" : "text-white/70 hover:text-white") : on ? "text-ink" : "text-ink/70 hover:text-ink",
                 )}
               >
+                {l.label}
                 {on && (
                   <motion.span
                     layoutId="nav-current"
                     aria-hidden
-                    className="absolute inset-x-0.5 inset-y-1.5 rounded-full bg-white/55 shadow-[inset_0_1px_0_rgb(255_255_255/0.8),0_2px_8px_rgb(11_8_20/0.08)]"
+                    className={cn("absolute inset-x-3.5 bottom-2 h-0.5 rounded-full", dark ? "bg-white" : "bg-ink")}
                     transition={reduce ? { duration: 0 } : SPRING}
                   />
                 )}
-                <span className="relative">{l.label}</span>
               </a>
             );
           })}
         </nav>
 
-        <Link
-          href="/pamphlet"
-          className="group flex min-h-11 items-center gap-1 justify-self-end text-sm text-ink/80 transition-colors duration-150 hover:text-ink"
-        >
-          {LABELS.pamphlet}
-          <ArrowUpRight
-            aria-hidden
-            className="size-4 transition-transform duration-150 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 motion-reduce:transition-none"
-          />
-        </Link>
+        <div className="flex items-center gap-2 justify-self-end">
+          <Link
+            href="/pamphlet"
+            className={cn(
+              PILL,
+              "hidden rounded-lg border-2 px-3.5 text-sm sm:inline-flex",
+              dark ? "border-white/40 text-white hover:border-white" : "border-ink/30 text-ink hover:border-ink",
+            )}
+          >
+            {LABELS.pamphlet}
+          </Link>
+          <a href="#demo" className={cn(PILL, PILL_PRIMARY, "rounded-lg px-3.5 text-sm shadow-none")}>
+            {LABELS.watchDemo}
+          </a>
+        </div>
       </div>
     </header>
   );

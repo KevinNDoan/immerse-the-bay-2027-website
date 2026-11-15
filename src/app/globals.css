@@ -162,8 +162,24 @@
     outline: 2px solid var(--ink);
     outline-offset: 3px;
   }
-  /* On the dark 3D screens an Ink ring would vanish; use the yellow accent there. */
-  .screen :focus-visible {
+  /* On anything dark (the 3D screens, the dark half of the page, the nav while it is over it) an Ink ring
+     would vanish, so focus turns lightning yellow there. --ring feeds the shadcn components' rings. */
+  .screen,
+  [data-tone="dark"] {
+    --ring: var(--zap);
+  }
+  .screen :focus-visible,
+  [data-tone="dark"] :focus-visible {
     outline-color: var(--zap);
+  }
+}
+
+/* The progress bars in the headset claims (WhyXr.tsx) fill from empty to full over each claim's hold. */
+@keyframes fill {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
   }
 }
