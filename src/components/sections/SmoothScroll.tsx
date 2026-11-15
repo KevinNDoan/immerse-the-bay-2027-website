@@ -1,133 +1,204 @@
 "use client";
 
 import "lenis/dist/lenis.css";
-import { ReactLenis, useLenis } from "lenis/react";
-import Snap from "lenis/snap";
-import { useReducedMotion } from "motion/react";
-import { useEffect, type ReactNode } from "react";
+import Lenis from "lenis";
+import { createContext, useCallback, useContext, useEffect, useRef, type ReactNode } from "react";
+import { nextSectionStop, sectionStops, SectionGesture } from "@/lib/section-scroll";
 
-/** Every top-level section is one stop in the pitch. */
-const SLIDES = "main > section";
-/** How long a move between sections takes, in seconds, and its curve: a quick start and a soft landing. */
-const DURATION = 0.9;
-const EASE = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
+const SECTIONS = ".zap-experience main > section";
+const DURATION = 0.95;
+const ease = (t: number) => t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
+const INTERACTIVE = "input, textarea, select, button, a, summary, video, audio, [contenteditable]:not([contenteditable='false']), [role='slider'], [data-pitch-keys='off']";
+const NATIVE_SCROLL = "dialog, [data-lenis-prevent], [data-scroll-native], textarea, select, [contenteditable]:not([contenteditable='false'])";
 
-const NEXT_KEYS = new Set(["ArrowDown", "ArrowRight", "PageDown"]);
-const PREV_KEYS = new Set(["ArrowUp", "ArrowLeft", "PageUp"]);
+type Navigate = (id: string, immediate?: boolean) => void;
 
-/** Keys pressed while typing, or inside a widget that uses the arrows itself, are left alone. */
-function isForSomethingElse(e: KeyboardEvent) {
-  if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return true;
-  const t = e.target instanceof HTMLElement ? e.target : null;
-  if (!t) return false;
-  if (t.isContentEditable || t.closest("input, textarea, select, [data-pitch-keys='off']")) return true;
-  // Space presses a focused button or link.
-  return e.key === " " && t.closest("button, a, summary, [role='button']") !== null;
-}
-
-/**
- * Where the next or previous press should land. Normally that is the top of the next or previous section.
- * A section taller than the screen (a small laptop, or an open question) is paged through first, so nothing
- * in it gets skipped.
- */
-function stop(dir: 1 | -1, from: number) {
-  const vh = window.innerHeight;
-  const max = document.documentElement.scrollHeight - vh;
-  const slides = [...document.querySelectorAll<HTMLElement>(SLIDES)].map((el, i) => {
-    const r = el.getBoundingClientRect();
-    const top = i === 0 ? 0 : Math.round(r.top + window.scrollY);
-    return { top, bottom: Math.round(r.bottom + window.scrollY) };
+const nativeNavigate: Navigate = (id, immediate = false) => {
+  const target = document.getElementById(id);
+  target?.scrollIntoView({
+    behavior: immediate || window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+    block: "start",
   });
-  if (slides.length === 0) return null;
+};
 
-  const EPS = 4;
-  let cur = 0;
-  slides.forEach((s, i) => {
-    if (s.top <= from + EPS) cur = i;
-  });
-  const s = slides[cur];
+const SectionScrollContext = createContext<Navigate>(nativeNavigate);
+export const useSectionScroll = () => useContext(SectionScrollContext);
 
-  if (dir === 1) {
-    if (s.bottom > from + vh + EPS) return Math.min(from + vh * 0.85, s.bottom - vh);
-    return Math.min(slides[cur + 1]?.top ?? max, max);
-  }
-  if (from > s.top + EPS) return Math.max(s.top, from - vh * 0.85);
-  return slides[cur - 1]?.top ?? 0;
-}
-
-/**
- * Pitch controls. Arrow keys, Page Up and Page Down (what most presentation clickers send) and Space step
- * through the page one section at a time. With a wheel or trackpad, a scroll that stops near the top of a
- * section settles onto it; touch scrolling is left alone.
- */
-function PitchControls({ smooth }: { smooth: boolean }) {
-  const lenis = useLenis();
-
-  useEffect(() => {
-    if (!lenis) return;
-    // Only settles when a scroll stops within about one wheel notch of a section top, so a slow, deliberate
-    // scroll is never dragged back.
-    const snap = new Snap(lenis, { type: "proximity", distanceThreshold: 90, debounce: 350, duration: DURATION, easing: EASE });
-    snap.addElements([...document.querySelectorAll<HTMLElement>(SLIDES)], { align: ["start"] });
-    return () => snap.destroy();
-  }, [lenis]);
-
-  useEffect(() => {
-    // Where the last key press sent the page, and until when that move runs. Lenis only updates its own target
-    // as a scripted move animates, so a quick second press has to count from here instead.
-    let pending: { to: number; until: number } | null = null;
-    const onKey = (e: KeyboardEvent) => {
-      const dir = NEXT_KEYS.has(e.key) || (e.key === " " && !e.shiftKey) ? 1 : PREV_KEYS.has(e.key) || e.key === " " ? -1 : 0;
-      if (dir === 0 || isForSomethingElse(e)) return;
-      // Mid-move, count from where the page is heading, so quick presses keep advancing.
-      const moving = pending && performance.now() < pending.until;
-      const to = stop(dir, moving && pending ? pending.to : lenis ? lenis.targetScroll : window.scrollY);
-      if (to === null) return;
-      e.preventDefault();
-      // A held key would race through the whole pitch; one press, one section.
-      if (e.repeat) return;
-      pending = { to, until: performance.now() + DURATION * 1000 + 50 };
-      if (lenis) lenis.scrollTo(to, { duration: DURATION, easing: EASE });
-      else window.scrollTo({ top: to, behavior: smooth ? "smooth" : "auto" });
-    };
-    // A wheel, touch or pointer scroll takes over from a key move, so the next key press counts from where
-    // the page really is.
-    const drop = () => {
-      pending = null;
-    };
-    window.addEventListener("keydown", onKey);
-    window.addEventListener("wheel", drop, { passive: true });
-    window.addEventListener("touchstart", drop, { passive: true });
-    window.addEventListener("pointerdown", drop, { passive: true });
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      window.removeEventListener("wheel", drop);
-      window.removeEventListener("touchstart", drop);
-      window.removeEventListener("pointerdown", drop);
-    };
-  }, [lenis, smooth]);
-
-  return null;
-}
-
-/**
- * Smooth wheel scrolling and the pitch controls for the whole page. Anyone who asked for reduced motion gets
- * native scrolling, and the keys jump straight to each section.
- */
+/** Desktop gestures use a single controlled transition. Touch uses native CSS section snapping. */
 export function SmoothScroll({ children }: { children: ReactNode }) {
-  const reduce = useReducedMotion();
-  if (reduce) {
-    return (
-      <>
-        <PitchControls smooth={false} />
-        {children}
-      </>
-    );
-  }
-  return (
-    <ReactLenis root options={{ anchors: true, autoRaf: true, lerp: 0.12 }}>
-      <PitchControls smooth />
-      {children}
-    </ReactLenis>
-  );
+  const navigateRef = useRef<Navigate | null>(null);
+  const navigate = useCallback<Navigate>((id, immediate = false) => {
+    // Let React close a menu or dialog before scrolling to its destination.
+    requestAnimationFrame(() => (navigateRef.current ?? nativeNavigate)(id, immediate));
+  }, []);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const finePointer = window.matchMedia("(pointer: fine)");
+    const presentationViewport = window.matchMedia("(min-width: 901px) and (min-height: 600px)");
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let destroyController: (() => void) | undefined;
+
+    function configure() {
+      destroyController?.();
+      destroyController = undefined;
+      // Compact screens and zoomed layouts keep native scrolling so tall content stays accessible.
+      if (!finePointer.matches || !presentationViewport.matches || reducedMotion.matches) return;
+      const sections = [...document.querySelectorAll<HTMLElement>(SECTIONS)];
+      if (!sections.length) return;
+      root.dataset.zapScroll = "controlled";
+      const gesture = new SectionGesture();
+      let moving = false;
+      let disposed = false;
+
+      const getStops = () => sectionStops(
+        sections.map(section => {
+          const bounds = section.getBoundingClientRect();
+          return { top: bounds.top + window.scrollY, bottom: bounds.bottom + window.scrollY };
+        }),
+        window.innerHeight,
+        Math.max(0, root.scrollHeight - window.innerHeight),
+      );
+
+      const modalOpen = () => !!document.querySelector(".zap-experience dialog[open]");
+      const lenis = new Lenis({
+        autoRaf: true,
+        anchors: false,
+        duration: DURATION,
+        easing: ease,
+        syncTouch: false,
+        allowNestedScroll: true,
+        stopInertiaOnNavigate: true,
+        virtualScroll: ({ deltaX, deltaY, event }) => {
+          if (disposed || !event.type.includes("wheel")) return true;
+          if (event.defaultPrevented || event.ctrlKey || event.shiftKey || Math.abs(deltaX) > Math.abs(deltaY)) return false;
+          const target = event.target instanceof Element ? event.target : null;
+          if (modalOpen() || target?.closest(NATIVE_SCROLL)) return false;
+          if (!event.cancelable) return false;
+          event.preventDefault();
+          root.dataset.zapScroll = "controlled";
+          const direction = gesture.sample(deltaY, performance.now(), moving);
+          if (direction) goTo(nextSectionStop(getStops(), lenis.scroll, direction));
+          return false;
+        },
+      });
+
+      function goTo(position: number | HTMLElement, immediate = false) {
+        if (disposed || modalOpen()) return;
+        root.dataset.zapScroll = "controlled";
+        lenis.start();
+        lenis.resize();
+        moving = true;
+        lenis.scrollTo(position, {
+          duration: DURATION,
+          easing: ease,
+          immediate,
+          force: true,
+          lock: true,
+          onComplete: () => { moving = false; },
+        });
+      }
+
+      navigateRef.current = (id, immediate = false) => {
+        const target = document.getElementById(id);
+        if (target) {
+          gesture.reset();
+          goTo(target, immediate);
+        }
+      };
+
+      function onKey(event: KeyboardEvent) {
+        const target = event.target instanceof Element ? event.target : null;
+        if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey || modalOpen()) return;
+        const pageKey = ["PageDown", "PageUp", "Home", "End"].includes(event.key);
+        if (target?.closest(INTERACTIVE) && (!pageKey || target.closest("input, textarea, select, video, audio, [contenteditable], [role='slider'], [data-pitch-keys='off']"))) return;
+        const forward = ["ArrowDown", "ArrowRight", "PageDown"].includes(event.key) || event.key === " " && !event.shiftKey;
+        const backward = ["ArrowUp", "ArrowLeft", "PageUp"].includes(event.key) || event.key === " " && event.shiftKey;
+        if (!forward && !backward && event.key !== "Home" && event.key !== "End") return;
+        event.preventDefault();
+        if (event.repeat || moving) return;
+        gesture.reset();
+        const stops = getStops();
+        const position = event.key === "Home" ? 0 : event.key === "End" ? stops.at(-1)! : nextSectionStop(stops, lenis.scroll, forward ? 1 : -1);
+        goTo(position);
+      }
+
+      function onAnchor(event: MouseEvent) {
+        if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey || modalOpen()) return;
+        const anchor = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>("a[href]") : null;
+        if (!anchor || anchor.hasAttribute("download") || anchor.target && anchor.target !== "_self") return;
+        const url = new URL(anchor.href, window.location.href);
+        if (!url.hash || url.origin !== window.location.origin || url.pathname !== window.location.pathname || url.search !== window.location.search) return;
+        let id: string;
+        try { id = decodeURIComponent(url.hash.slice(1)); } catch { return; }
+        const target = document.getElementById(id);
+        if (!target) return;
+        event.preventDefault();
+        gesture.reset();
+        goTo(target);
+        if (window.location.hash !== url.hash) window.history.pushState(window.history.state, "", url.hash);
+        if (!target.hasAttribute("tabindex")) target.tabIndex = -1;
+        target.focus({ preventScroll: true });
+      }
+
+      function cancelMotion() {
+        const wasStopped = lenis.isStopped;
+        lenis.stop();
+        if (!wasStopped) lenis.start();
+        moving = false;
+        gesture.reset();
+      }
+
+      function onFocus() {
+        // Tabbing can move the viewport. Stop an in-flight animation instead of pulling focus away.
+        if (moving && document.activeElement?.matches(INTERACTIVE)) cancelMotion();
+      }
+
+      function onTouchStart() {
+        cancelMotion();
+        // Hybrid laptops can switch from trackpad to direct touch without changing pointer media queries.
+        delete root.dataset.zapScroll;
+      }
+
+      const dialog = document.querySelector(".zap-experience dialog");
+      const modalObserver = new MutationObserver(() => {
+        cancelMotion();
+        if (modalOpen()) lenis.stop();
+        else lenis.start();
+      });
+      if (dialog) modalObserver.observe(dialog, { attributes: true, attributeFilter: ["open"] });
+      if (modalOpen()) lenis.stop();
+
+      window.addEventListener("keydown", onKey);
+      window.addEventListener("click", onAnchor);
+      window.addEventListener("resize", cancelMotion);
+      window.addEventListener("touchstart", onTouchStart, { passive: true });
+      document.addEventListener("focusin", onFocus);
+      destroyController = () => {
+        disposed = true;
+        navigateRef.current = null;
+        modalObserver.disconnect();
+        window.removeEventListener("keydown", onKey);
+        window.removeEventListener("click", onAnchor);
+        window.removeEventListener("resize", cancelMotion);
+        window.removeEventListener("touchstart", onTouchStart);
+        document.removeEventListener("focusin", onFocus);
+        lenis.destroy();
+        delete root.dataset.zapScroll;
+      };
+    }
+
+    configure();
+    finePointer.addEventListener("change", configure);
+    presentationViewport.addEventListener("change", configure);
+    reducedMotion.addEventListener("change", configure);
+    return () => {
+      finePointer.removeEventListener("change", configure);
+      presentationViewport.removeEventListener("change", configure);
+      reducedMotion.removeEventListener("change", configure);
+      destroyController?.();
+    };
+  }, []);
+
+  return <SectionScrollContext value={navigate}>{children}</SectionScrollContext>;
 }

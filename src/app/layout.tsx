@@ -1,26 +1,34 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { SITE_URL } from "@/lib/site";
 
-// The design system's typeface for all text (design-system.md, Type). The logo keeps its own lettering.
-const bricolage = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-bricolage" });
+const bricolage = localFont({
+  src: [
+    { path: "../../assets/fonts/BricolageGrotesque-Regular.ttf", weight: "400", style: "normal" },
+    { path: "../../assets/fonts/BricolageGrotesque-Medium.ttf", weight: "500", style: "normal" },
+    { path: "../../assets/fonts/BricolageGrotesque-SemiBold.ttf", weight: "600", style: "normal" },
+    { path: "../../assets/fonts/BricolageGrotesque-Bold.ttf", weight: "700", style: "normal" },
+  ],
+  variable: "--font-bricolage",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "ZAP! Study in space",
+  title: "ZAP! Spatial knowledge for Meta Quest",
   description:
-    "ZAP! is a study tool for Meta Quest 3. Say a topic, throw it into space as a star, zap stars together, then step inside any of them.",
+    "Speak, place and connect ideas around you, then step inside their worlds. ZAP! is a spatial knowledge space for Meta Quest, built at Immerse the Bay.",
   openGraph: {
-    title: "ZAP! Study in space",
-    description: "Say it. Throw it. Zap it. Step inside.",
+    title: "ZAP! Small thought. Infinite worlds.",
+    description: "A spatial knowledge space for Meta Quest. Voice, hands and immersive worlds become the interface.",
     images: ["/art/zap-icon.png"],
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#dadee3",
+  themeColor: "#e0e7e4",
   colorScheme: "light",
 };
 

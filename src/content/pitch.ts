@@ -1,9 +1,9 @@
-// Every word of the pitch, in one place. The landing page, the /pamphlet page and the PDF all read from here,
-// so the copy never drifts between them.
+// Shared project copy for the overview, PDF, and legacy presentation components.
+// The immersive homepage has its presentation copy in components/experience/content.ts.
 //
 // House rules for this file (checked by `npm run check:copy`): no emoji, no em dashes, no dot separators,
 // no small all-caps labels above headings. Plain sentences. Claims stay true to
-// ~/immerse-the-bay-2027/docs/planning.md and docs/design-system.md.
+// the user-supplied Devpost description and the working headset demonstration.
 
 export type Step = { title: string; text: string };
 export type Claim = { title: string; text: string };
@@ -11,10 +11,10 @@ export type Question = { q: string; a: string };
 
 export const product = {
   name: "ZAP!",
-  headline: "Study in space.",
-  lead: "Say a topic and it lands in your hand as a star. Throw it, zap it to the next idea, then step inside it.",
+  headline: "A spatial knowledge space for Meta Quest.",
+  lead: "Speak a thought, give it a place, connect it to another, and step inside a world of questions.",
   platform: "For Meta Quest 3",
-  event: "Built at Immerse the Bay 2027 for the Living Worlds track.",
+  event: "Built at Immerse the Bay for the Living Worlds track.",
   tryPrompt: "Type a topic",
   tryExamples: ["Volcanoes", "Black holes", "The French Revolution", "Photosynthesis"],
 } as const;
@@ -27,19 +27,19 @@ export const problem = {
 export const steps: readonly Step[] = [
   {
     title: "Say it",
-    text: "Hold a button and say a topic. A star with a sticky note appears in your hand, along with a short summary and three ideas to explore next.",
+    text: "Hold the controller button and say a topic. An orb appears in your hand. AI writes its note using its parent ideas as context.",
   },
   {
     title: "Throw it",
-    text: "Throw the star into the dark and it drifts to a stop where you left it. Place ideas the way you think about them, close or far, high or low.",
+    text: "Throw an orb to place it in space. Pull or stretch the whole map with two hands.",
   },
   {
     title: "Zap it",
-    text: "Drag from one star to another and a bolt snaps between them, then settles into a glowing line. ZAP! suggests the link it thinks fits best.",
+    text: "Point from one orb to another to link related ideas. Each node stores its topic, note, position and links on the headset.",
   },
   {
     title: "Step inside",
-    text: "Pull a star to your face. The void gives way to a living world of that topic, all around you. Steer it with the sticks or ask for what you want to see.",
+    text: "Throw an orb forward to travel into its world. Grab and resize learning objects, ask questions aloud, and place answers on glass panes.",
   },
 ];
 
@@ -56,7 +56,7 @@ export const spaces = {
     },
     {
       title: "A world",
-      text: "Pull any star to your face and the void gives way to a moving world of that topic, generated live by Orbis. Steer it, then press a button to come back.",
+      text: "Enter a topic through its orb. Explore a world with real geometry, handle learning objects and ask questions aloud. The demo uses three worlds generated with World Labs.",
       cta: "Step inside",
       href: "#step-inside",
     },
@@ -64,16 +64,16 @@ export const spaces = {
 } as const;
 
 /** The heading over the row of parts, where Harvey shows its customers' logos. */
-export const builtOnHeading = "Built at Immerse the Bay 2027 on";
+export const builtOnHeading = "Built at Immerse the Bay on";
 
 /** A few true numbers, Harvey-style. Each one is backed by the answers further down the page. */
 export const numbers = {
   title: "ZAP! in numbers",
   items: [
-    { value: "4", label: "moves to learn: say it, throw it, zap it, step inside" },
-    { value: "2 s", label: "about how long a world takes to answer what you ask" },
-    { value: "30 cm", label: "the closest anything in ZAP! ever comes to your face" },
-    { value: "$0.58", label: "a minute on Orbis Stable, and only while you are inside a world" },
+    { value: "4", label: "moves: say it, place it, connect it, step inside" },
+    { value: "3", label: "prepared worlds in the headset demo" },
+    { value: "2", label: "hands to pull and stretch your map" },
+    { value: "0", label: "keyboards needed inside the headset" },
   ],
 } as const;
 
@@ -84,12 +84,12 @@ export const tryIt = {
 } as const;
 
 export const worlds = {
-  title: "Every topic is a place.",
-  text: "Inside a star, Orbis by Visko generates a world in real time and wraps it around you. Push a stick to move, look around, or say what you want to see. A marker shows your request is on its way, and about two seconds later the world answers.",
+  title: "Every orb is a doorway.",
+  text: "The Great Wall, a connected watchtower and a DNA biology lab were generated with World Labs. They load as textured 3D meshes, giving you real geometry to walk around in.",
   points: [
-    { title: "You steer", text: "Move, look, trigger an event, or ask out loud. Nothing plays on rails." },
-    { title: "It remembers", text: "Leave, and the star keeps a picture of where you went. Come back and you pick up from that view." },
-    { title: "It knows the context", text: "Each world is written from the topic and the ideas it connects to, so Pompeii looks different under Volcanoes than under Rome." },
+    { title: "Walk inside", text: "Travel through an orb into an immersive world and find your own viewpoint." },
+    { title: "Think with your hands", text: "Grab and resize learning objects. Keep the explanation on a glass pane beside you." },
+    { title: "Change it by voice", text: "Say create RNA and delete the DNA. AI describes the requested object using simple shapes, and Unity builds it." },
   ] satisfies Claim[],
 } as const;
 
@@ -97,16 +97,16 @@ export const whyXr = {
   title: "Why it has to be a headset",
   claims: [
     {
-      title: "Space is memory",
-      text: "People have tied ideas to places for over two thousand years. In ZAP! every idea has a real place you can point to and come back to.",
+      title: "Ideas have a place",
+      text: "Recognize a topic by its position, its neighbors, or its world. Spatial familiarity is a design goal; learning benefits have not been measured.",
     },
     {
-      title: "Hands make ideas real",
-      text: "Grabbing, throwing and zapping turns study into something you do, not something you scroll. The shape of the constellation is the shape of your understanding.",
+      title: "Hands make ideas tangible",
+      text: "Hold, move, rotate, and enlarge learning objects. Choose the viewpoint that helps you inspect a representation.",
     },
     {
-      title: "Presence beats description",
-      text: "A screen shows you a volcano. A headset puts you next to one, and gives the topic a place you can remember it by.",
+      title: "Questions have context",
+      text: "Ask about the world or an object you select. Answers stay on glass panes that you can place beside what you are exploring.",
     },
   ] satisfies Claim[],
 } as const;
@@ -114,62 +114,54 @@ export const whyXr = {
 export const builtOn = {
   title: "Built on",
   items: [
-    { name: "Meta Quest 3", role: "The headset, with Touch controllers" },
-    { name: "Unity 6", role: "OpenXR and the XR Interaction Toolkit" },
-    { name: "Orbis by Visko", role: "Real-time generated worlds, streamed through Reactor" },
-    { name: "GPT-6 Luna", role: "Summaries, suggestions and world prompts" },
-    { name: "Local speech recognition", role: "Your voice is turned into text on our laptop" },
+    { name: "Unity + C#", role: "Runtime and interaction on Meta Quest" },
+    { name: "World Labs", role: "Three generated environments, exported as meshes" },
+    { name: "Faster Whisper", role: "Local speech transcription through a Python service" },
+    { name: "GPT-6 Luna", role: "Notes, questions and object edits" },
+    { name: "Figma", role: "One shared theme for the spatial interface" },
   ],
   trackFit:
-    "Living Worlds asks for an XR experience centred on Orbis, steered live by the user. In ZAP!, Orbis is where every topic leads, and the user steers it every second they are inside.",
+    "ZAP! makes a learning topic into a place you can enter. You inspect and change learning objects, ask contextual questions, and connect each investigation to your wider constellation.",
 } as const;
 
 export const questions: readonly Question[] = [
   {
-    q: "What happens when the constellation gets big?",
-    a: "You reshape it with your hands. Pull it closer, stretch it from desk size to room size, or tap a star to bring it and its neighbours to you. Notes fade with distance, so only the ideas near you carry text.",
+    q: "Who is ZAP! for?",
+    a: "Independent learners following their own questions. Ideas can start as a subject, a specific question, or a connection between topics.",
   },
   {
-    q: "Is the generated world more than eye candy?",
-    a: "It is tied to your notes. Each world is written from the topic and the ideas connected to it, you steer it live, and the last view becomes the star's picture, a visual cue for what you learned there.",
+    q: "What can I explore now?",
+    a: "Three prepared environments: Great Wall outside, a connected watchtower, and a biology lab. These are generated interpretations, with schematic learning objects.",
   },
   {
-    q: "Will it make people feel sick?",
-    a: "We designed against it. In the void you move by walking and pulling the constellation, never with the sticks. Inside a world the sticks steer the video, while the dome around you stays still. Nothing is fixed to your view, comes closer than 30 cm, or flashes across the whole view.",
+    q: "What can voice change?",
+    a: "Create, revise, or remove learning objects. In the biology demo, asking to create RNA and delete DNA produced both changes. The room itself stays static.",
   },
   {
-    q: "The world takes two seconds to respond. Is that a problem?",
-    a: "Orbis applies a new instruction about two seconds after it is sent. A marker shows your request is on its way so the wait feels intended, and stick moves go straight to Orbis as short camera instructions, with no language model in between.",
+    q: "What stays when I return?",
+    a: "Each node keeps its topic, note, position and links in a small file on the headset. The app recreates the map from these files.",
   },
   {
-    q: "What if the Wi-Fi or Orbis goes down?",
-    a: "We bring our own router, and if a network blocks the headset from the laptop, a USB cable works instead. If Orbis is unreachable, a recorded world plays in its place and the rest of ZAP! keeps working.",
+    q: "What is still future work?",
+    a: "Generating new worlds while you wait, AI-suggested links and shared study spaces are next. Faster, more affordable world generation is the path to a real product.",
   },
   {
-    q: "Where does my voice go?",
-    a: "Speech is turned into text on our own laptop. Only that text goes to the language model, and every API key stays on the laptop, never on the headset.",
+    q: "How do I enter a world?",
+    a: "Every orb is a doorway. Throw one forward to travel into a world you can walk around in, inspect and ask questions about.",
   },
   {
-    q: "What does it cost to run?",
-    a: "Building the constellation costs a few short language model calls per topic. Worlds cost only while you are inside one, at about $0.58 a minute on Orbis Stable.",
+    q: "Can I trust the visuals?",
+    a: "Worlds provide a setting for questions. They are not surveyed historical reconstructions, and object changes are qualitative teaching illustrations, not validated simulations.",
   },
   {
-    q: "Who is it for?",
-    a: "Self-directed learners working through subjects made of connected ideas, like biology, history or how a system fits together. That kind of learning is where seeing the links helps most, and where we see the most good.",
-  },
-  {
-    q: "Can you trust what the world shows?",
-    a: "Treat it as a place, not a source. Worlds are there for presence and memory. The facts live on the note, as a short summary you can read and check, and the world is the scene you remember them by.",
-  },
-  {
-    q: "What comes next?",
-    a: "Sharing a constellation with a friend, importing your existing notes, spatial sound by Satie, hand tracking, doorways from one world straight into a connected one, and colour.",
+    q: "Is there a desktop experience?",
+    a: "The website includes a browser sketch of arranging and connecting nodes. ZAP! itself is built for Meta Quest, using controllers and voice.",
   },
 ];
 
 export const close = {
   title: "Come try it.",
-  text: "Put on the headset at our table and build your first constellation in a minute. Scan the code to take this pitch with you.",
+  text: "Put on the headset at our table and build your first constellation. Explore an idea with your voice and hands.",
   qrCaption: "Scan for the pamphlet",
   pdfLabel: "Download the PDF",
 } as const;
@@ -180,24 +172,24 @@ export const close = {
  */
 export const pamphlet = {
   title: "ZAP! overview",
-  subtitle: "A study tool for Meta Quest 3, built at Immerse the Bay 2027 for the Living Worlds track.",
+  subtitle: "A spatial knowledge space for Meta Quest, built at Immerse the Bay for the Living Worlds track.",
   intro:
-    "You say a topic, throw it into space as a star, zap related stars together, and step inside any of them to explore a world generated live by Orbis.",
+    "Speak an idea into an orb, arrange and connect it, then enter a world to investigate it. The demo includes the Great Wall exterior, a linked watchtower, and a biology lab.",
   whatTitle: "What it is",
   howTitle: "How it works",
   whyTitle: "Why VR?",
-  whyLead: "Because it has to be a headset. Three things a screen can't do:",
+  whyLead: "The headset adds physical scale, surrounding space, and direct handling:",
   questionsTitle: "What judges ask",
   techTitle: "Built on",
   trackTitle: "Why it fits Living Worlds",
   siteLabel: "See the full pitch",
-  footer: "Immerse the Bay 2027, Living Worlds track.",
+  footer: "Immerse the Bay, Living Worlds track.",
   offlineSaving: "Saving for offline",
   offlineReady: "Available offline",
   offlineNow: "Offline, showing the saved copy",
 } as const;
 
-/** The questions short enough for the overview: is the world more than eye candy, comfort, the lag, and the network. */
+/** Concise questions about the prepared demo, voice, persistence, and scope. */
 export const pamphletQuestions: readonly Question[] = [questions[1], questions[2], questions[3], questions[4]];
 
 /**

@@ -1,8 +1,6 @@
 # ZAP! pitch site
 
-The pitch site for ZAP!, a Meta Quest 3 study tool built at Immerse the Bay 2027 for the Visko Living Worlds track. It reads like a pitch deck that scrolls, one screen per section. A one-page overview for judges sits alongside it: they scan a QR code, read it like a shared doc, and it keeps working offline.
-
-The product itself lives in `~/immerse-the-bay-2027`. Its `docs/design-system.md` sets the look (updated 2026-11-15): the designer's silver sky behind frosted white glass panels, Ink text, lightning yellow `#FFD60A` as the one accent, and Bricolage Grotesque for all text. The 3D pieces (demo, Try it, portal) stay dark Void "screens", because their white star art needs a dark backdrop. Everything in `public/art/` is the designer's export from that project: `zap-wordmark.png` and `zap-icon.png` are the final logo, `sky.webp` is the sky panorama (lightened to screen silver `#DADEE3` and overlaid with the app icon's scanlines in `globals.css`, so the yellow logo sits cleanly on it), and the star, note and line images feed the 3D. The PDF uses the Bricolage Grotesque files in `assets/fonts/` (SIL OFL, licence alongside).
+A live hackathon presentation for ZAP!, a spatial knowledge space for Meta Quest built at Immerse the Bay. The homepage uses floating Three.js worlds, a four-step interaction story, a destination selector, and a playable constellation. Its visual direction takes inspiration from Immersive Garden's Louis Vuitton Collectibles experience, using ZAP!'s own objects, identity, and project story.
 
 ## Getting started
 
@@ -10,7 +8,7 @@ Requires Node.js 22 or newer.
 
 ```sh
 npm install
-cp .env.example .env.local   # set NEXT_PUBLIC_SITE_URL once deployed
+cp .env.example .env.local
 npm run dev
 ```
 
@@ -19,38 +17,52 @@ Open [localhost:3000](http://localhost:3000).
 ## Commands
 
 ```sh
-npm run dev         # Start the development server
-npm run build       # Create a production build (also builds the pamphlet PDF)
+npm run dev         # Development server
+npm run build       # Production build, including the overview PDF
 npm start           # Serve the production build
-npm run lint        # Check ESLint rules
+npm run lint        # ESLint
 npm run typecheck   # Generate route types and check TypeScript
-npm run check:copy  # Fail on em dashes, dot separators, emoji or all-caps labels in src/
+npm run check:copy  # Check the project's copy conventions
 ```
 
-## Pages
+## Pages and interactions
 
-- `/` is the pitch, laid out like harvey.ai's home page: a full-width bar (wordmark at the left edge, sections in the middle, two buttons at the right edge) that turns dark over the dark half. The light half: hero and a near edge-to-edge demo, the parts it is built on, the two spaces (the void and a world), the playable constellation, how it works (a list that drives the 3D scene), and the rotating reasons it has to be a headset. The dark half: stepping inside a world (the portal), ZAP! in numbers, questions judges ask, and a close with the QR code.
-- `/pamphlet` is the judges' overview, styled like a shared doc. Once opened it is saved for offline reading by `public/sw.js` (production builds only), and it prints on one Letter page.
-- `/zap-pamphlet.pdf` is the same overview as a one-page PDF, rendered once at build time.
+- `/`: Eight presentation sections: opening, why VR, interaction, worlds, idea map, build, lessons, and next steps. Content follows the team's supplied Devpost description. Headset footage opens in a simple modal player when the presenter requests it.
+- `/pamphlet`: The judges' overview. It supports print and offline reading after the first visit in production.
+- `/zap-pamphlet.pdf`: The overview PDF, generated at build time.
 
-## Pitching
+The browser constellation is an interaction sketch for the current visit. Add up to eight ideas, drag them to arrange, or select two to connect. Keyboard users can Tab to an idea, use arrow keys to move it, and Enter or Space to select it. A selected idea can be removed, and Start over restores the examples.
 
-Every top-level section fills at least one screen. Arrow keys, Space, Page Up and Page Down (what most presentation clickers send) move one section at a time, and a wheel or trackpad scroll that stops near a section settles onto it. Sections taller than the screen are paged through before moving on. The code is in `src/components/sections/SmoothScroll.tsx`.
+Wheel and trackpad gestures ease between section stops, with one transition per gesture. Arrow keys, Page Up/Down, Space, Home, End, and section links use the same navigation. Desktop presentation sections fit one viewport, with exactly one stop at each section start and no intermediate or footer stops. Compact screens and zoomed layouts use native scrolling to keep longer content accessible. Touch uses native section snapping, and system reduced-motion preferences disable animated transitions. Dialogs, video controls, and the constellation keep their own interactions.
 
-## Environment
+Run the scroll regression checks with `node --experimental-strip-types --test scripts/section-scroll.test.mjs`.
 
-- `NEXT_PUBLIC_SITE_URL`: the public address of the site, with no trailing slash. Every QR code points to `<this>/pamphlet`, and the PDF bakes it in at build time, so it must be set when you build (on Vercel, as a project environment variable). Without it the codes point to `http://localhost:3000` and the build prints a warning.
+The optional headset demo and destination stills come from the actual product recording. The floating hero combines captured world imagery with decorative Three.js objects, and the browser constellation remains an interaction sketch. The copy distinguishes the project's three prepared environments from its future ambitions.
+
+Animation can be paused in the hero and respects system reduced-motion preferences. Canvases stop rendering offscreen, cap pixel density, and fall back to CSS illustrations if WebGL fails. Existing local Bricolage Grotesque fonts eliminate font-service requests during builds.
 
 ## Project structure
 
-- `src/content/pitch.ts`: every word of the pitch. The site, the pamphlet page and the PDF all read from it.
-- `src/components/sections/`: one file per section of the landing page.
-- `src/components/scene/`: the React Three Fiber constellation scenes and the Try it demo.
-- `src/components/ui/`: shadcn components.
-- `src/lib/`: `site.ts` for the site URL, `qr.ts` for server-side QR codes, `motion.ts` for motion constants.
-- `src/app/pamphlet/`, `src/app/zap-pamphlet.pdf/`: the pamphlet page and PDF route.
-- `scripts/check-copy.mjs`: the copy rules check.
+- `src/components/experience/`: The active homepage, styles, presentation copy, procedural Three.js scenes, and constellation playground.
+- `src/content/pitch.ts`: Shared copy for the overview, PDF, and retained legacy presentation components.
+- `src/components/sections/SmoothScroll.tsx`: Active section navigation controller using Lenis.
+- Other files in `src/components/sections/` and `src/components/scene/`: Earlier presentation components retained for reuse.
+- `src/app/pamphlet/`, `src/app/zap-pamphlet.pdf/`: The overview page and PDF route.
+- `src/lib/`: Site URL, QR helpers, and shared utilities.
+- `public/art/`: Original ZAP! branding and artwork.
+- `public/media/zap/`: Optimized headset tour, descriptive captions, and product stills.
+- `docs/product-recording.md`: Observations, source timestamps, and media provenance.
+- `scripts/prepare-product-media.py`: Optional ffmpeg export helper; takes the original recording path as an argument.
+- `assets/fonts/`: Local Bricolage Grotesque fonts and their SIL OFL license.
+
+## Product recording
+
+The 91-second silent demo opens only on request, with native playback and fullscreen controls and optional descriptive captions. There is no chapter sidebar or video narration section. Closing the player stops playback. The optimized MP4 is about 7 MB; the 1.7 GB source stays outside the repository. To regenerate the media, run the optional Python helper with ffmpeg installed. See `docs/product-recording.md` for exact source ranges.
+
+## Deployment configuration
+
+Set `NEXT_PUBLIC_SITE_URL` to the deployment's public address before building. The PDF and QR codes bake this URL into their output. Without it, they use `http://localhost:3000` and the build prints a warning.
 
 ## Libraries
 
-Next.js 16 (App Router), React 19, Tailwind CSS v4, shadcn/ui (Radix), Motion, Three.js with React Three Fiber and drei, Lenis, qrcode, and @react-pdf/renderer.
+Next.js 16, React 19, Three.js, React Three Fiber, drei, Tailwind CSS v4, Lucide, and the existing PDF and QR tooling. No additional dependencies are required for the redesign.
