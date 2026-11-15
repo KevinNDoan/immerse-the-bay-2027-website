@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, CirclePlay, Layers3, Link2, Menu, Pause, Play, RotateCcw, X } from "lucide-react";
 import { HeadsetDemo } from "./HeadsetDemo";
 import { useSectionScroll } from "@/components/sections/SmoothScroll";
-import { destinations, rituals } from "./content";
+import { captures, destinations, rituals } from "./content";
 import type { UniverseProps } from "./UniverseCanvas";
 import "./experience.css";
 
@@ -20,6 +20,14 @@ function Visual({ description, ...props }: UniverseProps & { description: string
     <div className="zap-marble-fallback" aria-hidden="true">{fallbackWorlds.map(index => <span key={index} data-world={index} style={{ backgroundImage: `url(${destinations[index].image})` }} />)}</div>
     <UniverseCanvas {...props} onReady={setReady} />
   </div>;
+}
+
+/** A real headset still, framed small beside the illustration so the page shows the product, not only 3D. */
+function Capture({ image, alt, caption, corner = false }: { image: string; alt: string; caption: string; corner?: boolean }) {
+  return <figure className={corner ? "zap-capture zap-capture-corner" : "zap-capture"}>
+    <Image src={image} alt={alt} width={1000} height={1000} sizes="280px" />
+    <figcaption>{caption}</figcaption>
+  </figure>;
 }
 
 export function ZapExperience() {
@@ -92,7 +100,7 @@ export function ZapExperience() {
 
       <section id="ritual" className="zap-slide zap-ritual" aria-labelledby="ritual-heading">
         <Visual variant="ritual" step={step} paused={paused} description={rituals[step].visual} />
-        <div className="zap-slide-heading"><span className="zap-eyebrow">02 / Voice to world</span><h2 id="ritual-heading" key={step}>{rituals[step].title}<br /><em>{rituals[step].accent}</em></h2><p className="zap-one-line" aria-live="polite">{rituals[step].caption}</p></div>
+        <div className="zap-slide-heading"><span className="zap-eyebrow">02 / Voice to world</span><h2 id="ritual-heading" key={step}>{rituals[step].title}<br /><em>{rituals[step].accent}</em></h2><p className="zap-one-line" aria-live="polite">{rituals[step].caption}</p><Capture {...captures.voice} /></div>
         <div className="zap-slide-dock"><div className="zap-step-tabs" role="group" aria-label="Show an interaction">{rituals.map((item, index) => <button key={item.short} onClick={() => setStep(index)} aria-pressed={step === index}><span>0{index + 1}</span>{item.short}<ArrowUpRight size={16} /></button>)}</div></div>
       </section>
 
@@ -106,6 +114,7 @@ export function ZapExperience() {
       <section id="play" className="zap-slide zap-connections-slide" aria-labelledby="play-heading">
         <Visual variant="connections" connected={connected} paused={paused} description={connected ? "Golden threads link the three world marbles, with sparks traveling between related ideas." : "Three separate world marbles wait to be connected."} />
         <div className="zap-slide-heading"><span className="zap-eyebrow">04 / A constellation of ideas</span><h2 id="play-heading">Make a<br /><em>connection.</em></h2></div>
+        <Capture {...captures.connect} corner />
         <div className="zap-slide-dock"><button className="zap-pill zap-primary" aria-pressed={connected} onClick={() => setConnected(!connected)}>{connected ? <><RotateCcw size={17} /> Start again</> : <><Link2 size={17} /> Link these ideas</>}</button><p aria-live="polite">3 ideas. {connected ? "3 connections." : "One possibility."}</p></div>
       </section>
 

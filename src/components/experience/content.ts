@@ -43,3 +43,17 @@ export const rituals = [
   { short: "Connect", title: "One idea.", accent: "Another.", caption: "Point. Link. Follow the thought.", visual: "A gold thread connects two world marbles, with a spark traveling between them." },
   { short: "Enter", title: "Go on.", accent: "Step inside.", caption: "An entire world, in your hand.", visual: "A Great Wall marble expands to reveal its miniature mountains, walls and towers." },
 ] as const;
+
+/** Real headset captures from the product recording (see docs/product-recording.md), one per section. */
+export const captures = {
+  voice: {
+    image: "/media/zap/ribosome.jpg",
+    alt: "Actual headset view of a teal ribosome made on request in the biology lab, with a pane explaining its parts.",
+    caption: "In the headset: a ribosome, made by voice.",
+  },
+  connect: {
+    image: "/media/zap/constellation.jpg",
+    alt: "Actual headset view of the constellation: the Great Wall, Watchtower and Biology Lab orbs, two of them linked.",
+    caption: "In the headset: linked worlds.",
+  },
+} as const;
